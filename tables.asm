@@ -1401,6 +1401,21 @@ db $04
 ;AD - Small Key of Ganon's Tower
 ;AE - Reserved
 ;AF - Generic Small Key
+
+;C0 - Master Small Key of Sewers
+;C1 - Master Small Key of Hyrule Castle
+;C2 - Master Small Key of Eastern Palace
+;C3 - Master Small Key of Desert Palace
+;C4 - Master Small Key of Agahnim's Tower
+;C5 - Master Small Key of Swamp Palace
+;C6 - Master Small Key of Dark Palace
+;C7 - Master Small Key of Misery Mire
+;C8 - Master Small Key of Skull Woods
+;C9 - Master Small Key of Ice Palace
+;CA - Master Small Key of Tower of Hera
+;CB - Master Small Key of Thieves' Town
+;CC - Master Small Key of Turtle Rock
+;CD - Master Small Key of Ganon's Tower
 ;================================================================================
 ;;Residual Portal
 ;org $0283E0 ; PC 0x103E0 (Bank02.asm:816) (BNE)
@@ -1917,8 +1932,12 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
 db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
 
+; 0x186380 - 18638D
+MasterKeyQuantities:
+db $04, $04, $02, $04, $04, $06, $06, $06, $05, $06, $01, $03, $06, $08
+
 ;--------------------------------------------------------------------------------
-; 0x186380 - 187FFF (unused)
+; 0x18638E - 187FFF (unused)
 ;--------------------------------------------------------------------------------
 
 org $30EFFF ; PC 0x186FFF
