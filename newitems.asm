@@ -40,6 +40,7 @@
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ; #$B0 - Bee Trap
+; #$C0 - Key Rings
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -407,6 +408,30 @@ AddReceivedItemExpandedGetItem:
 				LDA $7EF36F : INC : STA $7EF36F
 			++
 			BRL .done
+	+ CMP.b #$C0 : !BLT + : CMP.b #$D0 : !BGE + ; Key Ring
+		AND #$0F : TAX
+		LDA.l KeyRingQuantities, X : BEQ .keyRingDone
+		PHA
+		CLC : ADC $7EF37C, X : STA $7EF37C, X
+
+		CPX.b #$00 : BNE ++
+			STA $7EF37D ; copy HC to sewers
+		++ : CPX.b #$01 : BNE ++
+			STA $7EF37C ; copy sewers to HC
+		++
+
+		LDA.l GenericKeys : BEQ .keyRingDungeon
+			PLA : CLC : ADC $7EF36F : STA $7EF36F
+			BRL .done
+		.keyRingDungeon
+		TXA : ASL : CMP $040C : BNE .keyRingDiscard
+			PLA : CLC : ADC $7EF36F : STA $7EF36F
+			BRL .done
+		.keyRingDiscard
+		PLA
+		BRL .done
+		.keyRingDone
+		BRL .done
 	+ CMP.b #$B0 : BNE + ; Bee Trap
 		LDA.b #$79 : JSL Sprite_SpawnDynamically : BMI + ; DashBeeHive_SpawnBee
 		LDA $22 : STA $0D10, Y : LDA $23 : STA $0D30, Y ; from enemizer's Spawn_Bees
@@ -671,7 +696,7 @@ AddReceivedItemExpanded:
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  0 ; Bee Trap
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
-	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
+	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Key Ring
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 	db  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; Unused
 
@@ -718,7 +743,7 @@ AddReceivedItemExpanded:
 	db $47 ; Bee Trap
 	db $47, $2C, $47, $47 ; Fae, Bee, Jar, Apple
 	db $47, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
-	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F ; Key Ring
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 
@@ -759,7 +784,7 @@ AddReceivedItemExpanded:
 	db $02 ; Bee Trap
 
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
-	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
+	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Key Ring
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused
 	db $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02 ; Unused

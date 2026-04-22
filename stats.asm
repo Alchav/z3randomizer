@@ -265,8 +265,12 @@ CountChestKey: ; called by neighbor functions
 	PHA : PHX
 		LDA !MULTIWORLD_ITEM_PLAYER_ID : bne .end
 		CPY #$24 : BEQ +  ; small key for this dungeon - use $040C
-			CPY #$A0 : !BLT .end ; Ignore most items
-			CPY #$AE : !BGE .end ; Ignore reserved key and generic key
+			CPY #$A0 : !BLT .checkKeyRing ; Ignore most items
+			CPY #$AE : !BLT .dungeonKey ; Count dungeon small keys
+		.checkKeyRing
+			CPY #$C0 : !BLT .end
+			CPY #$CE : !BGE .end ; Ignore reserved key ring slots
+		.dungeonKey
 			TYA : AND.B #$0F : BNE ++ ; If this is a sewers key, instead count it as an HC key
 				INC
 			++ TAX : BRA .count  ; use Key id instead of $040C (Keysanity)
@@ -288,7 +292,13 @@ CountBonkItem: ; called from GetBonkItem in bookofmudora.asm
 		%GetPossiblyEncryptedItem(BonkKey_GTower, HeartPieceIndoorValues) : BRA ++
 	+ LDA.B #$24 ; default to small key
 	++
-	CMP #$24 : BNE +
+	CMP #$24 : BEQ .count
+	CMP #$A0 : !BLT .checkKeyRing
+	CMP #$AE : !BLT .count
+	.checkKeyRing
+	CMP #$C0 : !BLT +
+	CMP #$CE : !BGE +
+	.count
 		PHY
 			TAY : JSR CountChestKey
 		PLY

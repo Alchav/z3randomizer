@@ -27,6 +27,13 @@ Notice_SmallKeyOf:
 	db $75, $00, $BC, $00, $B6, $00, $AA, $00, $B5, $00, $B5, $00, $FF, $00, $B4, $00, $AE, $00, $C2, $00, $FF, $00, $BD, $00, $B8
 	dw #$7F7F
 
+; this is a
+; key ring to
+Notice_KeyRingOf:
+	db $74, $00, $BD, $00, $B1, $00, $B2, $00, $BC, $00, $FF, $00, $B2, $00, $BC, $00, $FF, $00, $AA
+	db $75, $00, $B4, $00, $AE, $00, $C2, $00, $FF, $00, $BB, $00, $B2, $00, $B7, $00, $B0, $00, $FF, $00, $BD, $00, $B8
+	dw #$7F7F
+
 ; light world
 Notice_LightWorld:
 	db $76, $00, $B5, $00, $B2, $00, $B0, $00, $B1, $00, $BD, $00, $FF, $00, $C0, $00, $B8, $00, $BB, $00, $B5, $00, $AD

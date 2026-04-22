@@ -149,9 +149,6 @@ incsrc msu.asm
 incsrc dialog.asm
 incsrc entrances.asm
 incsrc clock.asm
-incsrc accessability.asm
-incsrc heartbeep.asm
-incsrc capacityupgrades.asm
 print "End of Coda Bank $20: ", pc
 warnpc $A18000
 
@@ -179,6 +176,9 @@ org $A1FF00 ; static mapping area
 incsrc init.asm
 
 org $A48000 ; code bank - PUT NEW CODE HERE
+incsrc accessability.asm
+incsrc heartbeep.asm
+incsrc capacityupgrades.asm
 incsrc timer.asm
 incsrc doorframefixes.asm
 incsrc music.asm

@@ -177,13 +177,22 @@ FreeDungeonItemNotice:
 	+ : LDA.l FreeItemText : AND.b #$08 : CMP.b #$08 : BNE + ; show message for dungeon big key
 	LDA !ITEM_TEMPORARY : AND.b #$F0 : CMP.b #$90 : BNE + ; big key of...
 		%CopyDialog(Notice_BigKeyOf)
-		BRA .dungeon
+		BRL .dungeon
 	+ : LDA.l FreeItemText : AND.b #$01 : CMP.b #$01 : BNE + ; show message for dungeon small key
 	LDA !ITEM_TEMPORARY : AND.b #$F0 : CMP.b #$A0 : BNE + ; small key of...
 		LDA !ITEM_TEMPORARY : CMP.b #$AF : BNE ++ : BRL .skip : ++
 		%CopyDialog(Notice_SmallKeyOf)
 		PLA : AND.b #$0F : STA $7F5020 : LDA.b #$0F : !SUB $7F5020 : PHA
 		LDA #$01 : STA $7F5010 ; set up a flip for small keys
+		BRA .dungeon
+	+ : LDA.l FreeItemText : AND.b #$01 : CMP.b #$01 : BNE + ; show message for dungeon key ring
+	LDA !ITEM_TEMPORARY : AND.b #$F0 : CMP.b #$C0 : BNE + ; key ring of...
+		LDA !ITEM_TEMPORARY : CMP.b #$CE : !BLT .keyRingNotice
+			BRL .skip
+		.keyRingNotice
+		%CopyDialog(Notice_KeyRingOf)
+		PLA : AND.b #$0F : STA $7F5020 : LDA.b #$0F : !SUB $7F5020 : PHA
+		LDA #$01 : STA $7F5010 ; set up a flip for key rings
 		BRA .dungeon
 	+
 	BRL .skip ; it's not something we are going to give a notice for

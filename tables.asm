@@ -1401,6 +1401,22 @@ db $04
 ;AD - Small Key of Ganon's Tower
 ;AE - Reserved
 ;AF - Generic Small Key
+;C0 - Small Key Ring of Sewers
+;C1 - Small Key Ring of Hyrule Castle
+;C2 - Small Key Ring of Eastern Palace
+;C3 - Small Key Ring of Desert Palace
+;C4 - Small Key Ring of Agahnim's Tower
+;C5 - Small Key Ring of Swamp Palace
+;C6 - Small Key Ring of Dark Palace
+;C7 - Small Key Ring of Misery Mire
+;C8 - Small Key Ring of Skull Woods
+;C9 - Small Key Ring of Ice Palace
+;CA - Small Key Ring of Tower of Hera
+;CB - Small Key Ring of Thieves' Town
+;CC - Small Key Ring of Turtle Rock
+;CD - Small Key Ring of Ganon's Tower
+;CE - Reserved
+;CF - Reserved
 ;================================================================================
 ;;Residual Portal
 ;org $0283E0 ; PC 0x103E0 (Bank02.asm:816) (BNE)
@@ -1917,8 +1933,13 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
 db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00
 
+; 0x186380 - 18638F
+org $30E380 ; PC 0x186380
+KeyRingQuantities:
+db $04, $04, $02, $04, $04, $06, $06, $06, $05, $06, $01, $03, $06, $08, $00, $00
+
 ;--------------------------------------------------------------------------------
-; 0x186380 - 187FFF (unused)
+; 0x186390 - 187FFF (unused)
 ;--------------------------------------------------------------------------------
 
 org $30EFFF ; PC 0x186FFF
