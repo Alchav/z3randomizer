@@ -941,7 +941,11 @@ db #$00
 RainDeathRefillArrows_Mantle:
 db #$00
 ;================================================================================
-; 0x18018E - 0x18018F (unused)
+org $30818E ; PC 0x18018E
+BossPrizeShuffle:
+db #$00 ; #$00 = vanilla boss prizes (default) - #$01 = shuffled boss prizes use ordinary item IDs and warp after collection
+;================================================================================
+; 0x18018F (unused)
 ;================================================================================
 org $308190 ; PC 0x180190 - 0x180192
 TimerStyle:
@@ -959,7 +963,30 @@ org $308194 ; PC 0x180194
 TurnInGoalItems:
 db #$01 ; #$00 = Instant win if last goal item collected. $01 = (Default) must turn in goal items
 ;--------------------------------------------------------------------------------
-; 0x180195 - 0x1801FF (unused)
+org $308195 ; PC 0x180195 - 0x18019E [encrypted]
+BossPrizeValues:
+BossPrize_ArmosKnights:
+	db #$B6 ; Green Pendant
+BossPrize_Lanmolas:
+	db #$B7 ; Blue Pendant
+BossPrize_Moldorm:
+	db #$B8 ; Red Pendant
+BossPrize_HelmasaurKing:
+	db #$B9 ; Crystal 1
+BossPrize_Arrghus:
+	db #$BA ; Crystal 2
+BossPrize_Mothula:
+	db #$BB ; Crystal 3
+BossPrize_Blind:
+	db #$BC ; Crystal 4
+BossPrize_Kholdstare:
+	db #$BD ; Crystal 5
+BossPrize_Vitreous:
+	db #$BE ; Crystal 6
+BossPrize_Trinexx:
+	db #$BF ; Crystal 7
+;--------------------------------------------------------------------------------
+; 0x18019F - 0x1801FF (unused)
 ;================================================================================
 org $308200 ; PC 0x180200 - 0x18020F
 RedClockAmount:
@@ -1517,7 +1544,9 @@ dw #9999 ; Rupee Limit
 ; $7F5042 - Tile Upload Offset Override (Low)
 ; $7F5043 - Tile Upload Offset Override (High)
 ; $7F5044 - $7F5046 - NMI Auxiliary Function
-; $7F5047 - $7F504E - Unused
+; $7F5047 - Boss Prize Active Flag
+; $7F5048 - $7F5049 - Boss Prize Room ID
+; $7F504A - $7F504E - Unused
 ; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
@@ -1939,7 +1968,30 @@ KeyRingQuantities:
 db $04, $04, $02, $04, $04, $06, $06, $06, $05, $06, $01, $03, $06, $08, $00, $00
 
 ;--------------------------------------------------------------------------------
-; 0x186390 - 187FFF (unused)
+org $30E390 ; PC 0x186390 - 0x186399
+BossPrize_ArmosKnights_Player:
+db #$00
+BossPrize_Lanmolas_Player:
+db #$00
+BossPrize_Moldorm_Player:
+db #$00
+BossPrize_HelmasaurKing_Player:
+db #$00
+BossPrize_Arrghus_Player:
+db #$00
+BossPrize_Mothula_Player:
+db #$00
+BossPrize_Blind_Player:
+db #$00
+BossPrize_Kholdstare_Player:
+db #$00
+BossPrize_Vitreous_Player:
+db #$00
+BossPrize_Trinexx_Player:
+db #$00
+
+;--------------------------------------------------------------------------------
+; 0x18639A - 187FFF (unused)
 ;--------------------------------------------------------------------------------
 
 org $30EFFF ; PC 0x186FFF

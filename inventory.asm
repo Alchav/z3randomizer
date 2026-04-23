@@ -466,6 +466,9 @@ AddInventory:
 		JSR .incrementPendant
 		JSR .setDungeonCompletion
 		BRL .done
+	+ JSL.l MaybeIncrementOrdinaryBossPrizeCounts : BCC +
+		BRL .done
+	+
 	+ CPY.b #$3A : !BLT + ; Items $3A - $3B - Bow & Silver Arrows
 	  CPY.b #$3C : !BGE +
 		JSR .incrementBow

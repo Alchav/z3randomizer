@@ -1002,6 +1002,11 @@ org $1BBCC1 ; <- DBCC1 - Bank1B.asm : 223 (LDA $0F8004, X : AND.w #$01FF : STA $
 Overworld_Entrance_BRANCH_EPSILON: ; go here to lock doors
 ;--------------------------------------------------------------------------------
 ; -- HOOK THIS LATER TO FUCK WITH BOSS DROPS --
+org $01C709 ; <- C709 - Bank01.asm : 10347
+JSL.l BossPrizeRoomTag
+RTS
+NOP #48
+;--------------------------------------------------------------------------------
 org $01C73E ; <- C73E - Bank01.asm : 10377 (LDA $01C6FC, X : JSL Sprite_SpawnFallingItem)
 JSL.l DropSafeDungeon
 NOP #4
@@ -2679,4 +2684,3 @@ org $1BEE1B
 JSL Palette_ArmorAndGlovesRandSprite_part_two
 RTL
 ;--------------------------------------------------------------------------------
-

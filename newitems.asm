@@ -40,6 +40,16 @@
 ; #$90 - Big Keys
 ; #$A0 - Small Keys
 ; #$B0 - Bee Trap
+; #$B6 - Green Pendant
+; #$B7 - Blue Pendant
+; #$B8 - Red Pendant
+; #$B9 - Crystal 1
+; #$BA - Crystal 2
+; #$BB - Crystal 3
+; #$BC - Crystal 4
+; #$BD - Crystal 5
+; #$BE - Crystal 6
+; #$BF - Crystal 7
 ; #$C0 - Key Rings
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
@@ -463,6 +473,7 @@ AddReceivedItemExpandedGetItem:
         LDA.b #$1F : STA $0E00, Y
         LDA.b #$03 : STA $0E40, Y
 	+
+		JSL.l MaybeSetOrdinaryBossPrizeBits : BCS .done
 	.done
 	PLX
 	LDA $02E9 : CMP.b #$01 ; thing we wrote over
@@ -489,6 +500,7 @@ RTL
 AddReceivedItemExpanded:
 {
 	PHA : PHX
+		JSL.l BossPrizeApplyItemPlayer
 		LDA RemoteItems : BEQ + : LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 			LDA $02E9 : BEQ ++ : CMP #$03 : BNE +++ : ++
 				; fromTextOrObject
@@ -742,7 +754,7 @@ AddReceivedItemExpanded:
 
 	db $47 ; Bee Trap
 	db $47, $2C, $47, $47 ; Fae, Bee, Jar, Apple
-	db $47, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
+	db $47, $23, $23, $23, $28, $28, $28, $28, $28, $28, $28 ; Unused, Pendants, Crystals
 	db $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47 ; Key Ring
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
@@ -824,7 +836,7 @@ AddReceivedItemExpanded:
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Big Key
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  1 ; Bee Trap
-	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
+	db  4, 4, 4, 4, 4, 4, 2, 1, 6, 6, 6, 6, 6, 6, 6 ; Unused, Pendants, Crystals
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused

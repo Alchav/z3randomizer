@@ -138,7 +138,6 @@ incsrc maidencrystals.asm
 incsrc zoraking.asm
 incsrc catfish.asm
 incsrc flute.asm
-incsrc dungeondrops.asm
 incsrc halfmagicbat.asm
 incsrc newitems.asm
 incsrc mantle.asm
@@ -217,6 +216,7 @@ incsrc darkroomitems.asm
 incsrc multiworld.asm
 incsrc terrorpin.asm
 incsrc RandSprite.asm
+incsrc dungeondrops.asm
 print "End of Coda Bank $24: ", pc
 warnpc $A58000
 
