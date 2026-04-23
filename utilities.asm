@@ -49,7 +49,7 @@ GetSpriteID:
 	PHX
 	PHB : PHK : PLB
 	;--------
-	TAX : LDA.l .gfxSlots, X ; look up item gfx
+	TAX : LDA.w .gfxSlots, X ; look up item gfx
 	PLB : PLX
 	CMP.b #$F8 : !BGE .specialHandling
 RTL
@@ -213,11 +213,15 @@ GetSpritePalette:
 	PHX
 	PHB : PHK : PLB
 	;--------
-	TAX : LDA.l .gfxPalettes, X ; look up item gfx
+	TAX : LDA.w .gfxPalettes, X ; look up item gfx
 	PLB : PLX
 	CMP.b #$F8 : !BGE .specialHandling
 RTL
 	.specialHandling
+	CMP.b #$F9 : BNE ++ ; Crystal palette
+		JSL.l LoadCrystalItemPalette
+		RTL
+	++ 
 	CMP.b #$FD : BNE ++ ; Progressive Sword
 		LDA $7EF359
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
@@ -279,7 +283,7 @@ RTL
 	db $08, $08, $02, $02, $04, $02, $02, $02
 	db $04, $02, $04, $02, $08, $08, $04, $02
 
-	db $0A, $02, $04, $02, $04, $04, $00, $04
+	db $F9, $02, $04, $02, $04, $04, $00, $04
 	db $04, $08, $02, $02, $08, $04, $02, $08
 
 	db $04, $04, $08, $08, $08, $04, $02, $08
@@ -310,7 +314,7 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
 	db $08, $02, $08, $02 ; Fae, Bee, Jar, Apple
-	db $08, $08, $04, $02, $0A, $0A, $0A, $0A, $0A, $0A, $0A ; Unused, Pendants, Crystals
+	db $08, $08, $04, $02, $F9, $F9, $F9, $F9, $F9, $F9, $F9 ; Unused, Pendants, Crystals
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Key Ring
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
@@ -383,7 +387,7 @@ IsNarrowSprite:
 	;----
 	-
 	CPX.b #$34 : !BGE .false ; finish if we've done the whole list
-	CMP.l .smallSprites, X : BNE + ; skip to next if we don't match
+	CMP.w .smallSprites, X : BNE + ; skip to next if we don't match
 	;--
 	SEC ; set true state
 	BRA .done ; we're done

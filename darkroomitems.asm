@@ -1,9 +1,21 @@
 CheckReceivedItemPropertiesBeforeLoad:
+    TXA
+    CMP.b #$20 : BEQ .loadCrystalPalette
+    CMP.b #$B9 : BCC .normalLightCheck
+    CMP.b #$C0 : BCC .loadCrystalPalette
+
+.normalLightCheck
     LDA $A0 : BEQ .normalCode
     LDA $7EC005 : BNE .lightOff
     .normalCode
     LDA.l AddReceivedItemExpanded_properties, X ;Restore Rando Code
     RTL
+
+.loadCrystalPalette
+    PHX
+    JSL.l LoadCrystalItemPalette
+    PLX
+    BRA .normalLightCheck
 
 .lightOff
     PHX : PHY : PHB
@@ -25,3 +37,16 @@ CheckReceivedItemPropertiesBeforeLoad:
     INC $15
     LDA #$00
     RTL
+
+LoadCrystalItemPalette:
+    PHP
+    PHX
+
+    LDA.b #$04 : STA $0AB1
+    LDA.b #$02 : STA $0AA9
+    JSL.l $0DED72 ; Palette_MiscSpr.justSP6
+
+    PLX
+    PLP
+    LDA.b #$0C
+RTL

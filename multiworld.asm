@@ -136,34 +136,41 @@ GetMultiworldItem:
 	+
 	PLA
 
+	BRA .checkCurrentDungeonKey
+	.thisdungeon_near
+		BRL .thisdungeon
+	.keyend_near
+		BRL .keyend
+	.checkCurrentDungeonKey
+
 	; Check if we have a key for the dungeon we are currently in
 	LDX $040C
 	; Escape
 	CMP #$A0 : BNE + : CPX #$00 : BEQ ++ : CPX #$02 : BEQ ++ : BRL .keyend : ++ : BRL .thisdungeon : +
 	; Eastern
-	CMP #$A2 : BNE + : CPX #$04 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A2 : BNE + : CPX #$04 : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; Desert
-	CMP #$A3 : BNE + : CPX #$06 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A3 : BNE + : CPX #$06 : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; Hera
-	CMP #$AA : BNE + : CPX #$14 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$AA : BNE + : CPX #$14 : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; Aga
-	CMP #$A4 : BNE + : CPX #$08 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A4 : BNE + : CPX #$08 : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; PoD
-	CMP #$A6 : BNE + : CPX #$0C : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A6 : BNE + : CPX #$0C : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; Swamp
-	CMP #$A5 : BNE + : CPX #$0A : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A5 : BNE + : CPX #$0A : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; SW
-	CMP #$A8 : BNE + : CPX #$10 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A8 : BNE + : CPX #$10 : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; TT
-	CMP #$AB : BNE + : CPX #$16 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$AB : BNE + : CPX #$16 : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; Ice
-	CMP #$A9 : BNE + : CPX #$12 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A9 : BNE + : CPX #$12 : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; Mire
-	CMP #$A7 : BNE + : CPX #$0E : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$A7 : BNE + : CPX #$0E : BEQ .thisdungeon_near : BRA .keyend_near : +
 	; TR
-	CMP #$AC : BNE + : CPX #$18 : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$AC : BNE + : CPX #$18 : BNE ++ : BRL .thisdungeon : ++ : BRL .keyend : +
 	; GT
-	CMP #$AD : BNE + : CPX #$1A : BEQ .thisdungeon : BRA .keyend : +
+	CMP #$AD : BNE + : CPX #$1A : BNE ++ : BRL .thisdungeon : ++ : BRL .keyend : +
 	; GT BK
 	CMP #$92 : BNE .keyend : CPX #$1A : BNE .keyend : LDA #$32 : BRA .keyend
 	.thisdungeon
@@ -264,15 +271,15 @@ Multiworld_AddReceivedItem_notCrystal:
 {
 	TYA : STA $02E4 : PHX ; things we wrote over
 	
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
+		JML.l AddReceivedItem_notCrystal+5
+	+
 		PHY : LDY $02D8 : JSL AddInventory : PLY
 
 		%Print_Text(HUD_SentTo, #$0010, !MULTIWORLD_ITEM_PLAYER_ID)
 		LDA #$33 : STA $012F
 
 		JML.l AddReceivedItem_gfxHandling
-	+
-	JML.l AddReceivedItem_notCrystal+5
 }
 
 Multiworld_Ancilla_ReceiveItem_stillInMotion:
