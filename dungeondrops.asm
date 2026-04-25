@@ -238,6 +238,7 @@ HandleBossPrizeObjectFinished:
 
 	LDA $7F509F : BEQ +
 		LDA.b #$04 : STA $0C54, X
+		JSL.l HideBossPrizeItemVisual
 		STZ $1CF0 : STZ $1CF1
 		JSL.l Main_ShowTextMessage_Alt
 		LDA.b #$00 : STA $7F509F
@@ -256,6 +257,24 @@ HandleBossPrizeObjectFinished:
 	STZ $0C4A, X
 	STZ $0FC1
 	JML.l Ancilla_ReceiveItem_objectFinished+6
+;--------------------------------------------------------------------------------
+HideBossPrizeItemVisual:
+	PHP
+	REP #$20
+	LDA $E8 : SEC : SBC.w #$0018
+	SEP #$20
+	STA $0BFA, X
+	XBA
+	STA $0C0E, X
+
+	REP #$20
+	LDA $E2 : SEC : SBC.w #$0018
+	SEP #$20
+	STA $0C04, X
+	XBA
+	STA $0C18, X
+	PLP
+RTL
 ;--------------------------------------------------------------------------------
 MarkBossPrizeDungeonCompletion:
 	LDA $040C
