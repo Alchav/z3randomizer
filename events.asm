@@ -241,6 +241,7 @@ PostItemAnimation:
 	LDA.b #$00 : STA !ITEM_BUSY ; mark item as finished
 
 	LDA $7F509F : BEQ +
+		JSL.l BossPrizeReceiveContextMatches : BCS +
 		STZ $1CF0 : STZ $1CF1 ; reset decompression buffer
 		JSL.l Main_ShowTextMessage_Alt
 		LDA.b #$00 : STA $7F509F
@@ -250,8 +251,6 @@ PostItemAnimation:
 		REP #$20 : LDA $A0 : STA !MULTIWORLD_ROOMID : SEP #$20
 		LDA $0403 : STA !MULTIWORLD_ROOMDATA
 	+
-
-	JSL.l MaybeCollectBossPrize
 
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 		STZ $02E9

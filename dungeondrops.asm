@@ -3,6 +3,8 @@
 ;--------------------------------------------------------------------------------
 !BOSS_PRIZE_ACTIVE = "$7F5047"
 !BOSS_PRIZE_ROOM = "$7F5048"
+!BOSS_PRIZE_SLOT = "$7F504A"
+!ITEM_BUSY = "$7F5091"
 
 DropSafeDungeon:
 	LDA $040C : CMP #$08 : BEQ +
@@ -15,11 +17,18 @@ BossPrizeRoomTag:
 	JSL.l CheckIfBossRoom : BCC .vanilla
 
 	LDA $0403 : AND.b #$80 : BEQ .heartContainerStillExists
-	LDA $0403 : AND.b #$40 : BNE .criticalItemAlreadyObtained
+	JSL.l BossPrizeDungeonCompletionMatches : BCS .criticalItemAlreadyObtained
+	LDA !ITEM_BUSY : BNE .heartContainerStillExists
+	JSL.l BossPrizeSpawnReady : BCC .heartContainerStillExists
 
+	LDA $0E : PHA
 	JSL.l LoadBossPrizeRoomValue
-	JSL.l Sprite_SpawnFallingItem
+	JSL.l SpawnBossPrizeFallingItem : BCC +
+		PLA : STA $0E
+		BRA .heartContainerStillExists
+	+
 	JSL.l SetBossPrizeContext
+	PLA : STA $0E
 	BRA .clearTagFlag
 
 .vanilla
@@ -64,6 +73,83 @@ ClearBossPrizeContext:
 	STA !BOSS_PRIZE_ACTIVE
 	STA !BOSS_PRIZE_ROOM
 	STA !BOSS_PRIZE_ROOM+1
+	LDA.b #$FF : STA !BOSS_PRIZE_SLOT
+RTL
+;--------------------------------------------------------------------------------
+SpawnBossPrizeFallingItem:
+	JSL.l BossPrizeResolveItem
+	PHA
+
+	LDY.b #$04
+	LDA.b #$29
+	JSL.l AddAncillaLong : BCC .spawned
+		PLA
+		SEC
+		RTL
+
+	.spawned
+	PLA : STA $0C5E, X : TAY
+
+	PHX : PHB
+		LDA.b #AddReceivedItemExpanded_item_graphics_indices>>16 : PHA : PLB
+		LDA.w AddReceivedItemExpanded_item_graphics_indices, Y : STA $72
+		CMP.b #$FF : BEQ .invalidItem
+		CMP.b #$20 : BNE .getItemTiles
+			JSL.l DecompShieldGfx
+			LDA $72
+			BRA .getItemTiles
+
+		.invalidItem
+		LDA.b #$00
+
+		.getItemTiles
+		JSL.l GetAnimatedSpriteTile_variable
+
+		LDA $72 : CMP.b #$06 : BNE .notFighterSword
+			JSL.l DecompSwordGfx
+		.notFighterSword
+	PLB : PLX
+
+	LDA.b #$D0 : STA $0294, X
+	STZ $0C22, X
+	STZ $0C2C, X
+	STZ $0C54, X
+	LDA.b #$80 : STA $029E, X
+	LDA.b #$09 : STA $03B1, X
+	STZ $03A4, X
+	LDA.b #$05 : STA $0BF0, X
+	STZ $039F, X
+	STZ $0385, X
+	STZ $0394, X
+
+	LDA $0C5E, X : STA $02D8
+
+	LDA $040C : CMP.b #$14 : BNE .normalCoords
+		LDA $21 : AND.b #$FE : INC A : STA $01
+		                               STZ $00
+		LDA $23 : AND.b #$FE : INC A : STA $03
+		                               STZ $02
+		BRA .setCoords
+
+	.normalCoords
+	REP #$20
+		LDA $E8 : !ADD.w #$0078 : STA $00
+		LDA $E2 : !ADD.w #$0078 : STA $02
+	SEP #$20
+
+	.setCoords
+	LDY $0C5E, X
+	LDA.w AddReceivedItemExpanded_wide_item_flag, Y : BNE +
+		REP #$20
+		LDA $02 : !ADD.w #$0008 : STA $02
+		SEP #$20
+	+
+	LDA $00 : STA $0BFA, X
+	LDA $01 : STA $0C0E, X
+	LDA $02 : STA $0C04, X
+	LDA $03 : STA $0C18, X
+	TXA : STA !BOSS_PRIZE_SLOT
+	CLC
 RTL
 ;--------------------------------------------------------------------------------
 BossPrizeContextMatchesRoom:
@@ -85,39 +171,129 @@ BossPrizeContextMatchesRoom:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+BossPrizeContextMatchesSlot:
+	LDA !BOSS_PRIZE_SLOT : CMP.b #$FF : BEQ .mismatch
+	TXA : CMP !BOSS_PRIZE_SLOT : BNE .mismatch
+	SEC
+	RTL
+
+.mismatch
+	CLC
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeReceiveContextMatches:
+	LDA $02E9 : CMP.b #$03 : BNE .mismatch
+	JSL.l BossPrizeContextMatchesRoom : BCC .mismatch
+	JSL.l BossPrizeContextMatchesSlot : BCC .mismatch
+	SEC
+	RTL
+
+.mismatch
+	CLC
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeObjectContextMatches:
+	LDA $0C54, X : CMP.b #$03 : BNE .mismatch
+	JSL.l BossPrizeContextMatchesRoom : BCC .mismatch
+	JSL.l BossPrizeContextMatchesSlot : BCC .mismatch
+	SEC
+	RTL
+
+.mismatch
+	CLC
+RTL
+;--------------------------------------------------------------------------------
 BossPrizeApplyItemPlayer:
-	JSL.l BossPrizeContextMatchesRoom : BCC .done
+	JSL.l BossPrizeReceiveContextMatches : BCC .done
 	JSL.l BossPrizeGetPlayer : STA !MULTIWORLD_ITEM_PLAYER_ID
 .done
 RTL
 ;--------------------------------------------------------------------------------
-MaybeCollectBossPrize:
-	JSL.l BossPrizeContextMatchesRoom : BCC .done
+BossPrizeItemNeedsVictoryFanfare:
+	JSL.l BossPrizeObjectContextMatches : BCC .noFanfare
+	SEC
+	RTL
 
-	LDA $0403 : ORA.b #$40 : STA $0403
+.noFanfare
+	CLC
+RTL
+;--------------------------------------------------------------------------------
+BossPrizePendantWaitCheck:
+	LDA $0C5E, X : CMP.b #$37 : BEQ .waitForMusic
+	               CMP.b #$38 : BEQ .waitForMusic
+	               CMP.b #$39 : BEQ .waitForMusic
+
+	JSL.l BossPrizeItemNeedsVictoryFanfare : BCC .dontWaitForMusic
+
+.waitForMusic
+	JML.l PendantFanfareWait
+
+.dontWaitForMusic
+	JML.l PendantFanfareDone
+;--------------------------------------------------------------------------------
+HandleBossPrizeObjectFinished:
+	JSL.l BossPrizeObjectContextMatches : BCC .normalObjectFinished
 	JSL.l MarkBossPrizeDungeonCompletion
 	JSL.l ClearBossPrizeContext
-	JSL.l PrepDungeonExit
 
-.done
-RTL
+	LDA $7F509F : BEQ +
+		LDA.b #$04 : STA $0C54, X
+		STZ $1CF0 : STZ $1CF1
+		JSL.l Main_ShowTextMessage_Alt
+		LDA.b #$00 : STA $7F509F
+		JML.l Ancilla_ReceiveItem_return
+	+
+
+	STZ $0C4A, X
+	STZ $0FC1
+	LDA $0C54, X : PHA : PHX
+	JSL.l PrepDungeonExit
+	PLX : PLA
+
+	JML.l Ancilla_ReceiveItem_objectFinished+44
+
+.normalObjectFinished
+	STZ $0C4A, X
+	STZ $0FC1
+	JML.l Ancilla_ReceiveItem_objectFinished+6
 ;--------------------------------------------------------------------------------
 MarkBossPrizeDungeonCompletion:
 	LDA $040C
 	CMP #$FF : BEQ .done
 		LSR : AND #$0F : CMP #$08 : !BGE +
-			JSR .valueShift
+			JSR BossPrizeValueShift
 			ORA $7EF46B : STA $7EF46B
 			BRA .done
 		+
 			!SUB #$08
-			JSR .valueShift
+			JSR BossPrizeValueShift
 			BIT.b #$C0 : BEQ ++ : LDA.b #$C0 : ++ ; Make Hyrule Castle / Sewers Count for Both
 			ORA $7EF46C : STA $7EF46C
 .done
 RTL
 
-.valueShift
+BossPrizeDungeonCompletionMatches:
+	LDA $040C
+	CMP #$FF : BEQ .mismatch
+		LSR : AND #$0F : CMP #$08 : !BGE +
+			JSR BossPrizeValueShift
+			AND.l $7EF46B : BNE .match
+			BRA .mismatch
+		+
+			!SUB #$08
+			JSR BossPrizeValueShift
+			BIT.b #$C0 : BEQ ++ : LDA.b #$C0 : ++
+			AND.l $7EF46C : BNE .match
+
+.mismatch
+	CLC
+RTL
+
+.match
+	SEC
+RTL
+
+BossPrizeValueShift:
 	PHX
 	TAX : LDA.b #$01
 	-
@@ -128,6 +304,79 @@ RTL
 	+
 	PLX
 RTS
+;--------------------------------------------------------------------------------
+BossPrizeResolveItem:
+	PHA
+	JSL.l BossPrizeGetPlayer : CMP.b #$00 : BNE .remote
+	PLA
+	JSL.l AttemptItemSubstitutionLong
+	RTL
+
+.remote
+	PLA
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeDrawPrep:
+	REP #$20
+	LDA $00 : CLC : ADC.w #$0008 : STA $08
+	SEP #$20
+	PHX
+	LDA $0BF0, X : STA $74
+	JML.l BossPrizeDrawContinue
+;--------------------------------------------------------------------------------
+BossPrizeMasterSwordSourceCheck:
+	LDA $02E9 : CMP.b #$02 : BEQ .spriteSource
+	JSL.l BossPrizeReceiveContextMatches : BCS .spriteSource
+	JML.l BossPrizeMasterSwordSourceNormal
+
+.spriteSource
+	JML.l BossPrizeMasterSwordFromSprite
+;--------------------------------------------------------------------------------
+BossPrizeQueueFreeItemNotice:
+	JSL.l BossPrizeReceiveContextMatches : BCC .done
+	JSL.l BossPrizeGetPlayer : CMP.b #$00 : BNE .done
+	LDA $02D8 : JSL.l FreeDungeonItemNotice
+.done
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeSpawnReady:
+	LDX.b #$09
+
+.nextAncilla
+	LDA $0C4A, X : CMP.b #$22 : BEQ .blocked
+	DEX : BPL .nextAncilla
+	SEC
+	RTL
+
+.blocked
+	CLC
+	RTL
+;--------------------------------------------------------------------------------
+BossPrizeReceiveDispatch:
+	LDA $0C54, X : BEQ .fromTextOrObject
+	CMP.b #$03 : BEQ .fromTextOrObject
+	CMP.b #$04 : BEQ .waitForTextClose
+	JML.l Ancilla_ReceiveItem_fromChestOrSprite
+
+.fromTextOrObject
+	JML.l Ancilla_ReceiveItem_fromTextOrObject
+
+.waitForTextClose
+	LDA $10 : CMP.b #$0E : BEQ .keepWaiting
+	LDA $11 : BNE .keepWaiting
+	LDA $1CD8 : BNE .keepWaiting
+
+	STZ $0C4A, X
+	STZ $0FC1
+	LDA $0C54, X : PHA : PHX
+	JSL.l PrepDungeonExit
+	PLX : PLA
+	JML.l Ancilla_ReceiveItem_objectFinished+44
+
+.keepWaiting
+	LDA.b #$01 : STA $02E4
+	LDA.b #$01 : STA $0FC1
+	JML.l Ancilla_ReceiveItem_return
 ;--------------------------------------------------------------------------------
 MaybeSetOrdinaryBossPrizeBits:
 	CMP.b #$B6 : BNE +

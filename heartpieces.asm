@@ -94,14 +94,9 @@ DrawHeartContainerGFX:
 	BRA DrawHeartPieceGFX_skipLoad
 ;--------------------------------------------------------------------------------
 HeartContainerSound:
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
-	CPY.b #$20 : BEQ + ; Skip for Crystal
-	CPY.b #$37 : BEQ + ; Skip for Pendants
-	CPY.b #$38 : BEQ +
-	CPY.b #$39 : BEQ +
-    JSL.l CheckIfBossRoom : BCC + ; Skip if not in a boss room
-	        LDA.b #$2E
-			SEC
+	CPY.b #$3E : BNE +
+		LDA.b #$2E
+		SEC
 		RTL
 	+
 	CLC
@@ -114,18 +109,20 @@ NormalItemSkipSound:
 	+
 
 	LDA $0C5E, X ; thing we wrote over
-
-	CPY.b #$20 : BEQ + ; Skip for Crystal
-	CPY.b #$37 : BEQ + ; Skip for Pendants
-	CPY.b #$38 : BEQ +
-	CPY.b #$39 : BEQ +
-	
 	PHA
-    JSL.l CheckIfBossRoom
-	PLA
-RTL
+	JSL.l BossPrizeItemNeedsVictoryFanfare : BCC +
+		PLA
+		JSL Sound_SetSfxPanWithPlayerCoords
+		ORA.b #$13 : STA $012C
+		SEC
+		RTL
 	+
+	PLA
+	CMP.b #$3E : BEQ +
 	CLC
+	RTL
+	+
+	SEC
 RTL
 ;--------------------------------------------------------------------------------
 HeartUpgradeSpawnDecision: ; this should return #$00 to make the hp spawn

@@ -522,6 +522,7 @@ AddReceivedItemExpanded:
 
 			JSR IncrementItemCounters
 		+
+		JSL.l BossPrizeQueueFreeItemNotice
 		LDA $02D8 ; Item Value
 		
 		CMP.b #$16 : BEQ .bottle ; Bottle
@@ -1216,6 +1217,10 @@ AttemptItemSubstitution:
 .exit
 	PLA : PLX
 RTS
+;--------------------------------------------------------------------------------
+AttemptItemSubstitutionLong:
+	JSR AttemptItemSubstitution
+RTL
 ;--------------------------------------------------------------------------------
 CountBottles:
     PHX

@@ -218,10 +218,6 @@ GetSpritePalette:
 	CMP.b #$F8 : !BGE .specialHandling
 RTL
 	.specialHandling
-	CMP.b #$F9 : BNE ++ ; Crystal palette
-		JSL.l LoadCrystalItemPalette
-		RTL
-	++ 
 	CMP.b #$FD : BNE ++ ; Progressive Sword
 		LDA $7EF359
 		CMP.l ProgressiveSwordLimit : !BLT + ; Progressive Sword Limit
@@ -283,7 +279,7 @@ RTL
 	db $08, $08, $02, $02, $04, $02, $02, $02
 	db $04, $02, $04, $02, $08, $08, $04, $02
 
-	db $F9, $02, $04, $02, $04, $04, $00, $04
+	db $0C, $02, $04, $02, $04, $04, $00, $04
 	db $04, $08, $02, $02, $08, $04, $02, $08
 
 	db $04, $04, $08, $08, $08, $04, $02, $08
@@ -314,7 +310,7 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
 	db $08, $02, $08, $02 ; Fae, Bee, Jar, Apple
-	db $08, $08, $04, $02, $F9, $F9, $F9, $F9, $F9, $F9, $F9 ; Unused, Pendants, Crystals
+	db $08, $08, $04, $02, $0C, $0C, $0C, $0C, $0C, $0C, $0C ; Unused, Pendants, Crystals
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Key Ring
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused

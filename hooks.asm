@@ -900,6 +900,9 @@ LDA.w AddReceivedItemExpanded_item_masks, X
 org $098769 ; 48769 - ancilla_init.asm:1005 (LDA .item_graphics_indices, Y)
 LDA.w AddReceivedItemExpanded_item_graphics_indices, Y
 
+org $09878C ; 4878C - ancilla_init.asm:1028 (JSL GetAnimatedSpriteTile.variable)
+JSL.l GetAnimatedSpriteTile_variable
+
 org $09884D ; 4884D - ancilla_init.asm:1137 (LDA $836C, Y)
 LDA.w AddReceivedItemExpanded_y_offsets, Y
 org $09885B ; 4885B - ancilla_init.asm:1139 (LDA .x_offsets, X) - I think the disassembly is wrong here, should have been LDA .x_offsets, Y
@@ -915,6 +918,20 @@ LDA.w AddReceivedItemExpanded_x_offsets, Y
 
 org $08C6C8 ; 446C8 - ancilla_receive_item.asm:538 (LDA AddReceiveItem.properties, X)
 JSL CheckReceivedItemPropertiesBeforeLoad
+
+org $08C6B4 ; 446B4 - ancilla_receive_item.asm:520 alternate draw entry (PHX : LDA $0BF0, X : STA $74)
+JML.l BossPrizeDrawPrep
+NOP #2
+org $08C6BA
+BossPrizeDrawContinue:
+
+org $0987BB ; 487BB - ancilla_init.asm (LDA $02E9 : CMP.b #$02 : BEQ .masterSwordFromSprite)
+JML.l BossPrizeMasterSwordSourceCheck
+NOP #3
+org $0987C2
+BossPrizeMasterSwordSourceNormal:
+org $0987E2
+BossPrizeMasterSwordFromSprite:
 
 org $08C6DE ; 446DE - ancilla_receive_item.asm:550 (LDA .wide_item_flag, X)
 LDA.l AddReceivedItemExpanded_wide_item_flag, X
@@ -1556,8 +1573,17 @@ org $08C421 ; <- AD4021 F005 - ancilla_receive_item.asm:108 (LDA $2140 : BEQ .wa
 JML PendantFanfareWait : NOP
 PendantFanfareContinue:
 
+org $08C412 ; <- BD5E0C C937 F008 - ancilla_receive_item.asm:101 (LDA $0C5E, X : CMP.b #$37 : BEQ .isPendant)
+JML.l BossPrizePendantWaitCheck
+NOP #11
+
 org $08C42B
 PendantFanfareDone:
+
+org $08C61D ; <- BD5E0C C920 - ancilla_receive_item.asm:435 (LDA $0C5E, X : CMP.b #$20)
+JML.l CrystalItemBehaviorCheck
+NOP
+CrystalSpecialBehaviorContinue:
 
 org $08C62A ; <- AD4021 D008 - ancilla_receive_item.asm:442 (LDA $2140 : BNE .waitForSilence)
 JML CrystalFanfareWait : NOP
@@ -2025,6 +2051,20 @@ JSL.l AllowSQ
 org $08C45F ; <- 4445F - ancilla_recieve_item.asm:157 (STZ $02E9 : LDA $0C5E, X)
 Ancilla_ReceiveItem_optimus:
 JML.l PostItemAnimation : NOP #2
+
+org $08C3D0 ; <- 443D0 - ancilla_receive_item.asm:62 (LDA $0C54, X)
+JML.l BossPrizeReceiveDispatch
+NOP #8
+org $08C3DC
+Ancilla_ReceiveItem_fromTextOrObject:
+org $08C538
+Ancilla_ReceiveItem_return:
+org $08C539
+Ancilla_ReceiveItem_fromChestOrSprite:
+
+org $08C505 ; <- 44505 - ancilla_receive_item.asm:256 (STZ $0C4A, X : STZ $0FC1)
+JML.l HandleBossPrizeObjectFinished
+NOP #2
 
 org $08C548 ; <- 44548 - ancilla_recieve_item.asm:297 (CMP.b #$28 : BNE .dontGiveRupees)
 JML.l Multiworld_Ancilla_ReceiveItem_stillInMotion
