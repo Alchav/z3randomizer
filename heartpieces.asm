@@ -113,6 +113,8 @@ NormalItemSkipSound:
 		RTL
 	+
 
+	CPY.b #$CE : BEQ .skipSound ; Skip the current-dungeon key ring pickup fanfare
+
 	LDA $0C5E, X ; thing we wrote over
 
 	CPY.b #$20 : BEQ + ; Skip for Crystal
@@ -123,6 +125,9 @@ NormalItemSkipSound:
 	PHA
     JSL.l CheckIfBossRoom
 	PLA
+RTL
+	.skipSound
+	SEC
 RTL
 	+
 	CLC

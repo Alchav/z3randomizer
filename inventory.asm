@@ -544,8 +544,8 @@ AddInventory:
 	  CPY.b #$B0 : !BGE +
 		JSR .incrementKey
 		BRL .done
-	+ CPY.b #$C0 : !BLT + ; Items $C0 - $CD - Key Rings
-	  CPY.b #$CE : !BGE +
+	+ CPY.b #$C0 : !BLT + ; Items $C0 - $CE - Key Rings
+	  CPY.b #$CF : !BGE +
 		JSR .incrementKey
 		BRL .done
 	+

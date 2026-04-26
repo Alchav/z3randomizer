@@ -160,6 +160,12 @@ KeyGet:
 					- JSL.l FullInventoryExternal : jsl CountChestKeyLong : plx : pla : rtl
 			+ cmp #$af : beq - ; universal key
 			cmp #$24 : beq -   ; small key for this dungeon
+			cmp #$CE : bne +   ; small key ring for this dungeon
+				lda.l KeyRingQuantities, x : beq -
+				clc : adc $02, S : dec
+				sta $02, S
+				bra -
+			+
 		plx
 		.receive
 		jsl.l $0791b3 ; Player_HaltDashAttackLong

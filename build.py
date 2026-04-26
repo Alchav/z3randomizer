@@ -101,9 +101,9 @@ if __name__ == '__main__':
         else:
             errors = asar_errors()
             print_messages("Errors", errors, MAX_ERRORS_TO_PRINT)
-        warnings = [warning for warning in asar_warnings() if not is_deprecation_warning(warning)]
-        if warnings:
-            print_messages("Warnings", warnings, MAX_WARNINGS_TO_PRINT)
+        # warnings = [warning for warning in asar_warnings() if not is_deprecation_warning(warning)]
+        # if warnings:
+        #     print_messages("Warnings", warnings, MAX_WARNINGS_TO_PRINT)
 
         asar_close()
     except:

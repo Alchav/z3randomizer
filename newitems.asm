@@ -41,6 +41,7 @@
 ; #$A0 - Small Keys
 ; #$B0 - Bee Trap
 ; #$C0 - Key Rings
+; #$CE - Small Key Ring of Current Dungeon
 ; #$FE - Server Request (Asychronous Chest)
 ; #$FF - Null Chest
 ;--------------------------------------------------------------------------------
@@ -225,38 +226,38 @@ AddReceivedItemExpandedGetItem:
 		++
 			LDA.b #$04 ; bow with arrow
 		+++
-		STA $7EF340
-		.noequip
-		LDA !INVENTORY_SWAP_2 : ORA #$40 : STA !INVENTORY_SWAP_2 ; mark silver bow on y-toggle
-		BRL .done
+	STA $7EF340
+	.noequip
+	LDA !INVENTORY_SWAP_2 : ORA #$40 : STA !INVENTORY_SWAP_2 ; mark silver bow on y-toggle
+	BRL .done
 	+ CMP.b #$4C : BNE + ; 50 bombs
-		;LDA.b #$07 : STA $7EF370 ; upgrade bombs
-		LDA.b #50 : !SUB.l StartingMaxBombs : STA $7EF370 ; upgrade bombs
-		LDA.b #50 : STA $7EF375 ; fill bombs
-		BRL .done
+	;LDA.b #$07 : STA $7EF370 ; upgrade bombs
+	LDA.b #50 : !SUB.l StartingMaxBombs : STA $7EF370 ; upgrade bombs
+	LDA.b #50 : STA $7EF375 ; fill bombs
+	BRL .done
 	+ CMP.b #$4D : BNE + ; 70 arrows
-		;LDA #$07 : STA $7EF371 ; upgrade arrows
-		LDA.b #70 : !SUB.l StartingMaxArrows : STA $7EF371 ; upgrade arrows
-		LDA.b #70 : STA $7EF376 ; fill arrows
-		BRL .done
+	;LDA #$07 : STA $7EF371 ; upgrade arrows
+	LDA.b #70 : !SUB.l StartingMaxArrows : STA $7EF371 ; upgrade arrows
+	LDA.b #70 : STA $7EF376 ; fill arrows
+	BRL .done
 	+ CMP.b #$4E : BNE + ; 1/2 magic
-		LDA $7EF37B : CMP #$02 : !BGE ++
-			INC : STA $7EF37B ; upgrade magic
-		++
-		LDA.b #$80 : STA $7EF373 ; fill magic
-		BRL .done
+	LDA $7EF37B : CMP #$02 : !BGE ++
+		INC : STA $7EF37B ; upgrade magic
+	++
+	LDA.b #$80 : STA $7EF373 ; fill magic
+	BRL .done
 	+ CMP.b #$4F : BNE + ; 1/4 magic
-		LDA.b #$02 : STA $7EF37B ; upgrade magic
-		LDA.b #$80 : STA $7EF373 ; fill magic
-		BRL .done
+	LDA.b #$02 : STA $7EF37B ; upgrade magic
+	LDA.b #$80 : STA $7EF373 ; fill magic
+	BRL .done
 	+ CMP.b #$50 : BNE + ; Master Sword (Safe)
-		LDA $7EF359 : CMP.b #$02 : !BGE + ; skip if we have a better sword
-		LDA.b #$02 : STA $7EF359 ; set master sword
-		BRL .done
+	LDA $7EF359 : CMP.b #$02 : !BGE + ; skip if we have a better sword
+	LDA.b #$02 : STA $7EF359 ; set master sword
+	BRL .done
 	+ CMP.b #$51 : BNE + ; +5 Bombs
-		LDA $7EF370 : !ADD.b #$05 : STA $7EF370 ; upgrade bombs +5
-		LDA.l Upgrade5BombsRefill : STA $7EF375 ; fill bombs
-		BRL .done
+	LDA $7EF370 : !ADD.b #$05 : STA $7EF370 ; upgrade bombs +5
+	LDA.l Upgrade5BombsRefill : STA $7EF375 ; fill bombs
+	BRL .done
 	+ CMP.b #$52 : BNE + ; +10 Bombs
 		LDA $7EF370 : !ADD.b #$0A : STA $7EF370 ; upgrade bombs +10
 		LDA.l Upgrade10BombsRefill : STA $7EF375 ; fill bombs
@@ -332,63 +333,63 @@ AddReceivedItemExpandedGetItem:
 		BRL .done
 	+ CMP.b #$6B : BNE + ; Goal Collectable (Multi/Power Star)
 		BRA .multi_collect
-	+ CMP.b #$6C : BNE + ; Goal Collectable (Multi/Power Star) Alternate Graphic
-		.multi_collect
-		REP #$20
-		LDA GoalItemRequirement : BEQ ++
-		LDA !GOAL_COUNTER : INC : STA !GOAL_COUNTER
+		+ CMP.b #$6C : BNE + ; Goal Collectable (Multi/Power Star) Alternate Graphic
+			.multi_collect
+			REP #$20
+			LDA GoalItemRequirement : BEQ ++
+			LDA !GOAL_COUNTER : INC : STA !GOAL_COUNTER
 		CMP GoalItemRequirement : !BLT ++
 		SEP #$20
 		LDA TurnInGoalItems : BNE ++
 				JSL.l ActivateGoal
-		++
-		SEP #$20
-		BRL .done
-	+ CMP.b #$6D : BNE + ; Server Request F0
-		JSL.l ItemGetServiceRequest_F0
-		BRL .done
-	+ CMP.b #$6E : BNE + ; Server Request F1
-		JSL.l ItemGetServiceRequest_F1
-		BRL .done
-	+ CMP.b #$6F : BNE + ; Server Request F2
-		JSL.l ItemGetServiceRequest_F2
-		BRL .done
+			++
+			SEP #$20
+			BRL .done
+		+ CMP.b #$6D : BNE + ; Server Request F0
+			JSL.l ItemGetServiceRequest_F0
+			BRL .done
+		+ CMP.b #$6E : BNE + ; Server Request F1
+			JSL.l ItemGetServiceRequest_F1
+			BRL .done
+		+ CMP.b #$6F : BNE + ; Server Request F2
+			JSL.l ItemGetServiceRequest_F2
+			BRL .done
 	;+ CMP.b #$FE : BNE + ; Server Request (Null Chest)
 	;	JSL.l ItemGetServiceRequest
 	;	BRL .done
-	+ CMP.b #$70 : !BLT + : CMP.b #$80 : !BGE + ; Free Map
-		AND #$0F : CMP #$08 : !BGE ++
-			%ValueShift()
-			ORA $7EF368 : STA $7EF368 ; Map 1
-			BRL .done
+		+ CMP.b #$70 : !BLT + : CMP.b #$80 : !BGE + ; Free Map
+			AND #$0F : CMP #$08 : !BGE ++
+				%ValueShift()
+				ORA $7EF368 : STA $7EF368 ; Map 1
+				BRL .done
 		++
-			!SUB #$08
-			%ValueShift()
-			BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
-			ORA $7EF369 : STA $7EF369 ; Map 2
-		BRL .done
-	+ CMP.b #$80 : !BLT + : CMP.b #$90 : !BGE + ; Free Compass
-		AND #$0F : CMP #$08 : !BGE ++
-			%ValueShift()
-			ORA $7EF364 : STA $7EF364 ; Compass 1
+				!SUB #$08
+				%ValueShift()
+				BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
+				ORA $7EF369 : STA $7EF369 ; Map 2
 			BRL .done
+		+ CMP.b #$80 : !BLT + : CMP.b #$90 : !BGE + ; Free Compass
+			AND #$0F : CMP #$08 : !BGE ++
+				%ValueShift()
+				ORA $7EF364 : STA $7EF364 ; Compass 1
+				BRL .done
 		++
-			!SUB #$08
-			%ValueShift()
-			BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
-			ORA $7EF365 : STA $7EF365 ; Compass 2
-		BRL .done
-	+ CMP.b #$90 : !BLT + : CMP.b #$A0 : !BGE + ; Free Big Key
-		AND #$0F : CMP #$08 : !BGE ++
-			%ValueShift()
-			ORA $7EF366 : STA $7EF366 ; Big Key 1
+				!SUB #$08
+				%ValueShift()
+				BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
+				ORA $7EF365 : STA $7EF365 ; Compass 2
 			BRL .done
+		+ CMP.b #$90 : !BLT + : CMP.b #$A0 : !BGE + ; Free Big Key
+			AND #$0F : CMP #$08 : !BGE ++
+				%ValueShift()
+				ORA $7EF366 : STA $7EF366 ; Big Key 1
+				BRL .done
 		++
-			!SUB #$08
-			%ValueShift()
-			BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
-			ORA $7EF367 : STA $7EF367 ; Big Key 2
-		BRL .done
+				!SUB #$08
+				%ValueShift()
+				BIT.b #$C0 : BEQ +++ : LDA.b #$C0 : +++ ; Make Hyrule Castle / Sewers Count for Both
+				ORA $7EF367 : STA $7EF367 ; Big Key 2
+			BRL .done
 	+ CMP.b #$A0 : !BLT + : CMP.b #$B0 : !BGE + ; Free Small Key
 		AND #$0F : TAX
 		LDA $7EF37C, X : INC : STA $7EF37C, X ; Increment Key Count
@@ -408,8 +409,12 @@ AddReceivedItemExpandedGetItem:
 				LDA $7EF36F : INC : STA $7EF36F
 			++
 			BRL .done
+	+ CMP.b #$CE : BNE + ; Small Key Ring (Current Dungeon)
+		LDA $040C : LSR : TAX
+		BRA .keyRingCount
 	+ CMP.b #$C0 : !BLT + : CMP.b #$D0 : !BGE + ; Key Ring
 		AND #$0F : TAX
+		.keyRingCount
 		LDA.l KeyRingQuantities, X : BEQ .keyRingDone
 		PHA
 		CLC : ADC $7EF37C, X : STA $7EF37C, X
