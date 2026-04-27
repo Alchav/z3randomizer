@@ -934,7 +934,7 @@ org $0987E2
 BossPrizeMasterSwordFromSprite:
 
 org $08C6DE ; 446DE - ancilla_receive_item.asm:550 (LDA .wide_item_flag, X)
-LDA.l AddReceivedItemExpanded_wide_item_flag, X
+JSL.l BossPrizeShiftUpperItemTileAndLoadWideItemFlag
 
 org $08C6F9 ; 446F9 - ancilla_receive_item.asm:570 (LDA AddReceiveItem.properties, X)
 JSL CheckReceivedItemPropertiesBeforeLoad

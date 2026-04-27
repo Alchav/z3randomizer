@@ -95,12 +95,7 @@ IsMedallion:
 RTL
 ;--------------------------------------------------------------------------------
 LoadNarrowObject:
-	PHX
-	LDA $7F504C : BEQ +
-		LDA $7F504D : TAX
-	+
-	LDA.l AddReceivedItemExpanded_wide_item_flag, X : STA ($92), Y ; AddReceiveItem.wide_item_flag?
-	PLX
+	JSL.l BossPrizeLoadNarrowObject
 RTL
 ;--------------------------------------------------------------------------------
 DrawNarrowDroppedObject:

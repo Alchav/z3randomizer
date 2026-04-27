@@ -445,7 +445,7 @@ BossPrizeMilestoneShadowPrep:
 	LDA !BOSS_PRIZE_NARROW_SHADOW : BEQ .prepShadowY
 		LDX.b #$02
 		REP #$20
-		LDA $02 : SEC : SBC.w #$0004 : STA $02
+		LDA $02 : SEC : SBC.w #$0008 : STA $02
 		BRA .shadowYReady
 
 .prepShadowY
@@ -453,6 +453,43 @@ BossPrizeMilestoneShadowPrep:
 
 .shadowYReady
 	LDA $06 : CLC : ADC.w #$000C : STA $00
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeShiftUpperItemTileAndLoadWideItemFlag:
+	PHX : PHY
+	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .normalItem
+		LDA !BOSS_PRIZE_DISPLAY_ITEM : TAX
+		LDA.l AddReceivedItemExpanded_wide_item_flag, X : CMP.b #$02 : BEQ .loadWideFlag
+
+		TYA : ASL #2 : TAY
+		LDA ($90), Y : CLC : ADC.b #$04 : STA ($90), Y
+		BRA .loadWideFlag
+
+.normalItem
+.loadWideFlag
+	LDA.l AddReceivedItemExpanded_wide_item_flag, X
+	PLY : PLX
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeLoadNarrowObject:
+	PHX : PHY
+	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .normalItem
+		LDA !BOSS_PRIZE_DISPLAY_ITEM : TAX
+		BRA .loadWideFlag
+
+.normalItem
+	TXA
+
+.loadWideFlag
+	LDA.l AddReceivedItemExpanded_wide_item_flag, X : STA ($92), Y
+	CMP.b #$02 : BEQ .done
+	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .done
+
+	TYA : ASL #2 : TAY
+	LDA ($90), Y : CLC : ADC.b #$04 : STA ($90), Y
+
+.done
+	PLY : PLX
 RTL
 ;--------------------------------------------------------------------------------
 BossPrizeMasterSwordSourceCheck:
