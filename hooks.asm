@@ -942,6 +942,10 @@ JSL CheckReceivedItemPropertiesBeforeLoad
 org $08C70F ; 4470F - ancilla_receive_item.asm : 582 - (LDA.b #$00 : STA ($92), Y)
 JSL.l LoadNarrowObject
 
+org $08CDF3 ; 44DF3 - ancilla_milestone_item.asm:239 (REP #$20 : LDA $06 : ADD.w #$000C : STA $00)
+JSL.l BossPrizeMilestoneShadowPrep
+NOP #6
+
 ;org $0985ED ; 485ED - ancilla_init.asm:693 (LDA $02E9 : CMP.b #$01)
 ;JSL.l AddReceivedItemExpandedGetItem
 ;NOP

@@ -4,6 +4,9 @@
 !BOSS_PRIZE_ACTIVE = "$7F5047"
 !BOSS_PRIZE_ROOM = "$7F5048"
 !BOSS_PRIZE_SLOT = "$7F504A"
+!BOSS_PRIZE_NARROW_SHADOW = "$7F504B"
+!BOSS_PRIZE_DRAW_ACTIVE = "$7F504C"
+!BOSS_PRIZE_DISPLAY_ITEM = "$7F504D"
 !ITEM_BUSY = "$7F5091"
 
 DropSafeDungeon:
@@ -74,21 +77,28 @@ ClearBossPrizeContext:
 	STA !BOSS_PRIZE_ROOM
 	STA !BOSS_PRIZE_ROOM+1
 	LDA.b #$FF : STA !BOSS_PRIZE_SLOT
+	LDA.b #$00
+	STA !BOSS_PRIZE_NARROW_SHADOW
+	STA !BOSS_PRIZE_DRAW_ACTIVE
+	STA !BOSS_PRIZE_DISPLAY_ITEM
 RTL
 ;--------------------------------------------------------------------------------
 SpawnBossPrizeFallingItem:
-	JSL.l BossPrizeResolveItem
 	PHA
+	JSL.l BossPrizeResolveItem
+	STA !BOSS_PRIZE_DISPLAY_ITEM
+	PLA : PHA
 
 	LDY.b #$04
 	LDA.b #$29
 	JSL.l AddAncillaLong : BCC .spawned
 		PLA
 		SEC
-		RTL
+	RTL
 
 	.spawned
-	PLA : STA $0C5E, X : TAY
+	PLA : STA $0C5E, X
+	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
 
 	PHX : PHB
 		LDA.b #AddReceivedItemExpanded_item_graphics_indices>>16 : PHA : PLB
@@ -138,7 +148,7 @@ SpawnBossPrizeFallingItem:
 	SEP #$20
 
 	.setCoords
-	LDY $0C5E, X
+	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
 	LDA.w AddReceivedItemExpanded_wide_item_flag, Y : BNE +
 		REP #$20
 		LDA $02 : !ADD.w #$0008 : STA $02
@@ -326,22 +336,124 @@ RTS
 ;--------------------------------------------------------------------------------
 BossPrizeResolveItem:
 	PHA
-	JSL.l BossPrizeGetPlayer : CMP.b #$00 : BNE .remote
-	PLA
-	JSL.l AttemptItemSubstitutionLong
-	RTL
+	JSL.l BossPrizeGetPlayer : CMP.b #$00 : BEQ .local
 
 .remote
 	PLA
-RTL
+	RTL
+
+.local
+	PLA
+	JSL.l AttemptItemSubstitutionLong
+	CMP.b #$4E : BNE .notProgressiveMagic
+
+.progressiveMagic
+	LDA $7EF37B : BNE +
+		RTL
+	+
+	LDA.b #$4F
+	RTL
+
+.notProgressiveMagic
+	CMP.b #$5E : BNE .notProgressiveSword
+
+.progressiveSword
+	LDA $7EF359 : CMP.l ProgressiveSwordLimit : !BLT +
+		LDA.l ProgressiveSwordReplacement : RTL
+	+
+	LDA $7EF359 : CMP.b #$FF : BNE +
+		LDA.b #$49 : RTL
+	+ : CMP.b #$00 : BNE +
+		LDA.b #$49 : RTL
+	+ : CMP.b #$01 : BNE +
+		LDA.b #$50 : RTL
+	+ : CMP.b #$02 : BNE +
+		LDA.b #$02 : RTL
+	+ LDA.b #$03 : RTL
+
+.notProgressiveSword
+	CMP.b #$5F : BNE .notProgressiveShield
+
+.progressiveShield
+	LDA !PROGRESSIVE_SHIELD : LSR #6 : CMP.l ProgressiveShieldLimit : !BLT +
+		LDA.l ProgressiveShieldReplacement : RTL
+	+
+	LDA !PROGRESSIVE_SHIELD : AND.b #$C0 : BNE +
+		LDA.b #$04 : RTL
+	+ : CMP.b #$40 : BNE +
+		LDA.b #$05 : RTL
+	+ LDA.b #$06 : RTL
+
+.notProgressiveShield
+	CMP.b #$60 : BNE .notProgressiveArmor
+
+.progressiveArmor
+	LDA $7EF35B : CMP.l ProgressiveArmorLimit : !BLT +
+		LDA.l ProgressiveArmorReplacement : RTL
+	+
+	LDA $7EF35B : CMP.b #$00 : BNE +
+		LDA.b #$22 : RTL
+	+ LDA.b #$23 : RTL
+
+.notProgressiveArmor
+	CMP.b #$61 : BNE .notProgressiveGlove
+
+.progressiveGlove
+	LDA $7EF354 : BNE +
+		LDA.b #$1B : RTL
+	+ LDA.b #$1C : RTL
+
+.notProgressiveGlove
+	CMP.b #$64 : BEQ .progressiveBow
+	CMP.b #$65 : BNE .displayResolved
+
+.progressiveBow
+	LDA $7EF340 : INC : LSR : CMP.l ProgressiveBowLimit : !BLT +
+		LDA.l ProgressiveBowReplacement : RTL
+	+
+	LDA $7EF340 : INC : LSR : CMP.b #$00 : BNE +
+		LDA.b #$3A : RTL
+	+ LDA.b #$3B : RTL
+
+.displayResolved
+	RTL
 ;--------------------------------------------------------------------------------
 BossPrizeDrawPrep:
+	LDA.b #$00
+	STA !BOSS_PRIZE_NARROW_SHADOW
+	STA !BOSS_PRIZE_DRAW_ACTIVE
+	JSL.l BossPrizeContextMatchesRoom : BCC .restore
+	JSL.l BossPrizeContextMatchesSlot : BCC .restore
+	LDA.b #$01 : STA !BOSS_PRIZE_DRAW_ACTIVE
+	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
+	LDA.w AddReceivedItemExpanded_wide_item_flag, Y : BNE .restore
+	LDA.b #$01 : STA !BOSS_PRIZE_NARROW_SHADOW
+	REP #$20
+	LDA $02 : CLC : ADC.w #$0008 : STA $02
+	SEP #$20
+
+.restore
 	REP #$20
 	LDA $00 : CLC : ADC.w #$0008 : STA $08
 	SEP #$20
 	PHX
 	LDA $0BF0, X : STA $74
 	JML.l BossPrizeDrawContinue
+;--------------------------------------------------------------------------------
+BossPrizeMilestoneShadowPrep:
+	SEP #$20
+	LDA !BOSS_PRIZE_NARROW_SHADOW : BEQ .prepShadowY
+		LDX.b #$02
+		REP #$20
+		LDA $02 : SEC : SBC.w #$0004 : STA $02
+		BRA .shadowYReady
+
+.prepShadowY
+	REP #$20
+
+.shadowYReady
+	LDA $06 : CLC : ADC.w #$000C : STA $00
+RTL
 ;--------------------------------------------------------------------------------
 BossPrizeMasterSwordSourceCheck:
 	LDA $02E9 : CMP.b #$02 : BEQ .spriteSource

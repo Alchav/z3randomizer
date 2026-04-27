@@ -1,12 +1,17 @@
 CheckReceivedItemPropertiesBeforeLoad:
+    PHX
+    LDA $7F504C : BEQ +
+        LDA $7F504D : TAX
+    +
     LDA $A0 : BEQ .normalCode
     LDA $7EC005 : BNE .lightOff
     .normalCode
     LDA.l AddReceivedItemExpanded_properties, X ;Restore Rando Code
+    PLX
     RTL
 
 .lightOff
-    PHX : PHY : PHB
+    PHY : PHB
     LDA.l AddReceivedItemExpanded_properties, X ; get palette
 
     REP #$30
