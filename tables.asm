@@ -1546,7 +1546,11 @@ dw #9999 ; Rupee Limit
 ; $7F5044 - $7F5046 - NMI Auxiliary Function
 ; $7F5047 - Boss Prize Active Flag
 ; $7F5048 - $7F5049 - Boss Prize Room ID
-; $7F504A - $7F504E - Unused
+; $7F504A - Boss Prize Ancilla Slot
+; $7F504B - Boss Prize Narrow Shadow Flag
+; $7F504C - Boss Prize Draw Active Flag
+; $7F504D - Boss Prize Display Item
+; $7F504E - Unused
 ; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
