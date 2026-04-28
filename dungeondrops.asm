@@ -104,9 +104,13 @@ SpawnBossPrizeFallingItem:
 		LDA.b #AddReceivedItemExpanded_item_graphics_indices>>16 : PHA : PLB
 		LDA.w AddReceivedItemExpanded_item_graphics_indices, Y : STA $72
 		CMP.b #$FF : BEQ .invalidItem
-		CMP.b #$20 : BNE .getItemTiles
-			JSL.l DecompShieldGfx
-			LDA $72
+		CMP.b #$20 : BEQ .shieldItem
+		CMP.b #$2D : BEQ .shieldItem
+		CMP.b #$2E : BNE .getItemTiles
+	.shieldItem
+			TYA
+			JSL.l GetSpriteID
+			STA $72
 			BRA .getItemTiles
 
 		.invalidItem
@@ -115,9 +119,11 @@ SpawnBossPrizeFallingItem:
 		.getItemTiles
 		JSL.l GetAnimatedSpriteTile_variable
 
-		LDA $72 : CMP.b #$06 : BNE .notFighterSword
-			JSL.l DecompSwordGfx
-		.notFighterSword
+		LDA $72 : CMP.b #$06 : BEQ .swordItem
+		          CMP.b #$18 : BNE .notSwordItem
+	.swordItem
+			JSL.l BossPrizeDecompResolvedSwordGfx
+		.notSwordItem
 	PLB : PLX
 
 	LDA.b #$D0 : STA $0294, X
@@ -160,6 +166,34 @@ SpawnBossPrizeFallingItem:
 	LDA $03 : STA $0C18, X
 	TXA : STA !BOSS_PRIZE_SLOT
 	CLC
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeDecompResolvedSwordGfx:
+	PHP
+	SEP #$20
+	LDA $7EF359 : PHA
+	LDA !BOSS_PRIZE_DISPLAY_ITEM
+	CMP.b #$49 : BEQ .fighterSword
+	CMP.b #$01 : BEQ .masterSword
+	CMP.b #$50 : BEQ .masterSword
+	CMP.b #$02 : BEQ .temperedSword
+	LDA.b #$04 : BRA .loadSword
+
+.fighterSword
+	LDA.b #$01 : BRA .loadSword
+
+.masterSword
+	LDA.b #$02 : BRA .loadSword
+
+.temperedSword
+	LDA.b #$03
+
+.loadSword
+	STA $7EF359
+	JSL.l DecompSwordGfx
+	JSL.l Palette_Sword
+	PLA : STA $7EF359
+	PLP
 RTL
 ;--------------------------------------------------------------------------------
 BossPrizeContextMatchesRoom:
@@ -407,7 +441,7 @@ BossPrizeResolveItem:
 	CMP.b #$64 : BEQ .progressiveBow
 	CMP.b #$65 : BNE .displayResolved
 
-.progressiveBow
+	.progressiveBow
 	LDA $7EF340 : INC : LSR : CMP.l ProgressiveBowLimit : !BLT +
 		LDA.l ProgressiveBowReplacement : RTL
 	+
@@ -415,8 +449,8 @@ BossPrizeResolveItem:
 		LDA.b #$3A : RTL
 	+ LDA.b #$3B : RTL
 
-.displayResolved
-	RTL
+	.displayResolved
+		RTL
 ;--------------------------------------------------------------------------------
 BossPrizeDrawPrep:
 	LDA.b #$00

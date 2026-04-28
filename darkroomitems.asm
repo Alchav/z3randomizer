@@ -6,13 +6,13 @@ CheckReceivedItemPropertiesBeforeLoad:
     LDA $A0 : BEQ .normalCode
     LDA $7EC005 : BNE .lightOff
     .normalCode
-    LDA.l AddReceivedItemExpanded_properties, X ;Restore Rando Code
+    JSR .loadProperty
     PLX
     RTL
 
-.lightOff
+    .lightOff
     PHY : PHB
-    LDA.l AddReceivedItemExpanded_properties, X ; get palette
+    JSR .loadProperty
 
     REP #$30
     AND #$0007 ; mask out palette
@@ -30,6 +30,28 @@ CheckReceivedItemPropertiesBeforeLoad:
     INC $15
     LDA #$00
     RTL
+
+    .loadProperty
+    LDA $7F504C : BEQ .normalProperty
+    TXA : CMP.b #$04 : BEQ .blueShield
+          CMP.b #$05 : BEQ .redShield
+          CMP.b #$06 : BEQ .mirrorShield
+
+    .normalProperty
+    LDA.l AddReceivedItemExpanded_properties, X ; Restore Rando Code
+    RTS
+
+    .blueShield
+    LDA.b #$02
+    RTS
+
+    .redShield
+    LDA.b #$01
+    RTS
+
+    .mirrorShield
+    LDA.b #$04
+    RTS
 
 CrystalItemBehaviorCheck:
     LDA $0C5E, X : CMP.b #$20 : BNE .ordinaryItem
