@@ -154,12 +154,6 @@ SpawnBossPrizeFallingItem:
 	SEP #$20
 
 	.setCoords
-	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
-	LDA.w AddReceivedItemExpanded_wide_item_flag, Y : BNE +
-		REP #$20
-		LDA $02 : !ADD.w #$0008 : STA $02
-		SEP #$20
-	+
 	LDA $00 : STA $0BFA, X
 	LDA $01 : STA $0C0E, X
 	LDA $02 : STA $0C04, X
