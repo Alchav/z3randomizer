@@ -456,6 +456,7 @@ BossPrizeDrawPrep:
 	LDA.b #$00
 	STA !BOSS_PRIZE_NARROW_SHADOW
 	STA !BOSS_PRIZE_DRAW_ACTIVE
+	LDA $0C4A, X : CMP.b #$29 : BNE .restore
 	JSL.l BossPrizeContextMatchesRoom : BCC .restore
 	JSL.l BossPrizeContextMatchesSlot : BCC .restore
 	LDA.b #$01 : STA !BOSS_PRIZE_DRAW_ACTIVE
