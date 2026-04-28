@@ -62,3 +62,21 @@ CrystalItemBehaviorCheck:
 
 .bossPrizeCrystal
     JML.l CrystalSpecialBehaviorContinue
+
+MaybeLoadCrystalSpritePalette:
+    PHA
+    CMP.b #$20 : BEQ .loadPalette
+    CMP.b #$B9 : BCC .done
+    CMP.b #$C0 : BCS .done
+
+.loadPalette
+    PHX
+    LDA.b #$04 : STA $0AB1
+    LDA.b #$02 : STA $0AA9
+    JSL.l $1BED72 ; Palette_MiscSpr.justSP6
+    INC $15
+    PLX
+
+.done
+    PLA
+RTL

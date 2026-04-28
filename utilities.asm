@@ -490,9 +490,10 @@ RTS
 !SKIP_EOR = "$7F5008"
 ;--------------------------------------------------------------------------------
 DrawDynamicTile:
-	JSR PrepDrawRemoteItemSprite
+		JSR PrepDrawRemoteItemSprite
+		JSL.l MaybeLoadCrystalSpritePalette
 
-	JSL.l IsNarrowSprite : BCS .narrow
+		JSL.l IsNarrowSprite : BCS .narrow
 
 	.full
 	LDA.b #$01 : STA $06
@@ -521,9 +522,10 @@ DrawDynamicTile:
 RTL
 ;--------------------------------------------------------------------------------
 DrawDynamicTileNoShadow:
-	JSR PrepDrawRemoteItemSprite
+		JSR PrepDrawRemoteItemSprite
+		JSL.l MaybeLoadCrystalSpritePalette
 
-	JSL.l IsNarrowSprite : BCS .narrow
+		JSL.l IsNarrowSprite : BCS .narrow
 
 	.full
 	LDA.b #$01 : STA $06
@@ -551,8 +553,8 @@ RTL
 
 ;--------------------------------------------------------------------------------
 PrepDrawRemoteItemSprite:
-	PHA
-	LDA RemoteItems : BEQ +
+		PHA
+		LDA RemoteItems : BEQ +
 		PLA
 		CMP !MULTIWORLD_SCOUTREPLY_LOCATION : BNE ++
 			LDA !MULTIWORLD_SCOUT_LOCATION : BEQ +++
