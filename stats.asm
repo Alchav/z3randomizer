@@ -265,6 +265,7 @@ CountChestKey: ; called by neighbor functions
 	PHA : PHX
 		LDA !MULTIWORLD_ITEM_PLAYER_ID : bne .end
 		CPY #$24 : BEQ +  ; small key for this dungeon - use $040C
+		CPY #$CE : BEQ +  ; small key ring for this dungeon - use $040C
 			CPY #$A0 : !BLT .checkKeyRing ; Ignore most items
 			CPY #$AE : !BLT .dungeonKey ; Count dungeon small keys
 		.checkKeyRing

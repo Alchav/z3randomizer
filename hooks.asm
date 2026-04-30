@@ -2239,6 +2239,10 @@ BCC Link_ReceiveItem_notHeartContainer
 org $0799BA ; 399BA - Bank07.asm:4070 (LDA.b #$60 : STA $02D9)
 Link_ReceiveItem_notHeartContainer:
 ;--------------------------------------------------------------------------------
+org $0799BF ; 399BF - Bank07.asm:4072 (LDA $02E9 : BEQ .fromTextOrObject)
+JML.l Link_ReceiveItem_HandleCurrentDungeonKeyRing
+NOP #5
+;--------------------------------------------------------------------------------
 org $09887F ; <- 4887F - ancilla_init.asm : 1163 (LDA $0C5E, X : CMP.b #$3E : BEQ .doneWithSoundEffects)
 JSL NormalItemSkipSound
 NOP

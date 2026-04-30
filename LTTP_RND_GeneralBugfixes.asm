@@ -147,7 +147,6 @@ incsrc map.asm
 incsrc msu.asm
 incsrc dialog.asm
 incsrc entrances.asm
-incsrc clock.asm
 print "End of Coda Bank $20: ", pc
 warnpc $A18000
 
@@ -175,6 +174,43 @@ org $A1FF00 ; static mapping area
 incsrc init.asm
 
 org $A48000 ; code bank - PUT NEW CODE HERE
+
+Link_ReceiveItem_HandleCurrentDungeonKeyRing:
+	CPY.b #$CE : BNE .normalReceive
+	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .normalReceive
+	JSL.l ReceiveCurrentDungeonKeyRingQuiet
+	JSL.l Player_HaltDashAttackLong
+	CLC
+	PLB
+	RTL
+
+	.normalReceive
+	LDA $02E9
+	BEQ .fromTextOrObject
+	CMP.b #$03 : BNE .fromChestOrSprite
+	.fromChestOrSprite
+	JML $0799F2
+	.fromTextOrObject
+	JML $0799C8
+
+ReceiveCurrentDungeonKeyRingQuiet:
+	PHX : PHY
+		LDA $040C : CMP.b #$FF : BEQ .cleanup
+		LSR : TAX
+		LDA.l KeyRingQuantities, X : BEQ .cleanup
+		CLC : ADC $7EF36F : STA $7EF36F
+		JSL.l UpdateKeys
+		LDY.b #$CE
+		JSL.l FullInventoryExternal
+		JSL.l CountChestKeyLong
+		JSL.l HUD_RebuildLong
+	.cleanup
+		STZ $02D8 : STZ $02D9 : STZ $02E9
+		STZ $02DA : STZ $037B : STZ $02E4
+	PLY : PLX
+RTL
+
+incsrc clock.asm
 incsrc accessability.asm
 incsrc heartbeep.asm
 incsrc capacityupgrades.asm

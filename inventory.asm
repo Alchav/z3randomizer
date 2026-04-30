@@ -547,8 +547,8 @@ AddInventory:
 	  CPY.b #$B0 : !BGE +
 		JSR .incrementKey
 		BRL .done
-	+ CPY.b #$C0 : !BLT + ; Items $C0 - $CD - Key Rings
-	  CPY.b #$CE : !BGE +
+	+ CPY.b #$C0 : !BLT + ; Items $C0 - $CE - Key Rings
+	  CPY.b #$CF : !BGE +
 		JSR .incrementKey
 		BRL .done
 	+
@@ -763,6 +763,10 @@ RTS
 ; Link_ReceiveItem_HUDRefresh:
 ;--------------------------------------------------------------------------------
 Link_ReceiveItem_HUDRefresh:
+    LDA $7EF370 ; get bomb upgrades
+	!ADD.l StartingMaxBombs
+    CMP.b #0 : BEQ + ; do not add bombs if you can't carry any
+
 	LDA $7EF343 : BNE + ; skip if we have bombs
 	LDA $7EF375 : BEQ + ; skip if we are filling no bombs
 		DEC : STA $7EF375 ; decrease bomb fill count
@@ -780,6 +784,11 @@ RTL
 HandleBombAbsorbtion:
 	STA $7EF375 ; thing we wrote over
 	LDA $0303 : BNE + ; skip if we already have some item selected
+
+    LDA $7EF370 ; get bomb upgrades
+	!ADD.l StartingMaxBombs
+    CMP.b #0 : BEQ + ; do not switch to bombs if you can't carry any
+
 		LDA.b #$04 : STA $0202 ; set selected item to bombs
 		LDA.b #$01 : STA $0303 ; set selected item to bombs
 		JSL.l HUD_RebuildLong

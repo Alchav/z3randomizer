@@ -108,6 +108,8 @@ NormalItemSkipSound:
 		RTL
 	+
 
+	CPY.b #$CE : BEQ .skipSound ; Skip the current-dungeon key ring pickup fanfare
+
 	LDA $0C5E, X ; thing we wrote over
 	PHA
 	JSL.l BossPrizeItemNeedsVictoryFanfare : BCC +
@@ -122,6 +124,7 @@ NormalItemSkipSound:
 	CLC
 	RTL
 	+
+.skipSound
 	SEC
 RTL
 ;--------------------------------------------------------------------------------
