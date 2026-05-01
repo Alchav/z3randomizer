@@ -187,7 +187,7 @@ Link_ReceiveItem_HandleCurrentDungeonKeyRing:
 	.normalReceive
 	LDA $02E9
 	BEQ .fromTextOrObject
-	CMP.b #$03 : BNE .fromChestOrSprite
+	CMP.b #$03 : BEQ .fromTextOrObject
 	.fromChestOrSprite
 	JML $0799F2
 	.fromTextOrObject
