@@ -3,11 +3,16 @@ CheckReceivedItemPropertiesBeforeLoad:
     LDA $7F504C : BEQ +
         LDA $7F504D : TAX
     +
+    TXA
+    PHY
+    JSL.l MaybeLoadCrystalSpritePalette
+    PLY
     LDA $A0 : BEQ .normalCode
     LDA $7EC005 : BNE .lightOff
     .normalCode
     JSR .loadProperty
     PLX
+    CMP.b #$00 ; preserve vanilla BPL behavior by setting flags from the loaded property, not restored X
     RTL
 
     .lightOff
