@@ -75,11 +75,22 @@ MaybeLoadCrystalSpritePalette:
     CMP.b #$C0 : BCS .done
 
 .loadPalette
-    PHX
+    PHX : PHY
+    REP #$20
+    LDA $00 : PHA
+    LDA $02 : PHA
+    SEP #$20
+
     LDA.b #$04 : STA $0AB1
     LDA.b #$02 : STA $0AA9
     JSL.l $1BED72 ; Palette_MiscSpr.justSP6
     INC $15
+
+    REP #$20
+    PLA : STA $02
+    PLA : STA $00
+    SEP #$20
+    PLY
     PLX
 
 .done
