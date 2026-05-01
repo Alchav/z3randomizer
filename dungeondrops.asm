@@ -534,6 +534,7 @@ RTL
 ;--------------------------------------------------------------------------------
 BossPrizeApplyDisplayXOffset:
 	PHX : PHY
+	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
 	JSR.w BossPrizeLoadDisplayXOffset
 	BEQ .shiftRight
 	BRA .done
@@ -580,15 +581,6 @@ RTS
 ;--------------------------------------------------------------------------------
 BossPrizeLoadDisplayXOffset:
 	TYA
-	CMP.b #$20 : BEQ .ignore
-	CMP.b #$04 : BCC .load
-	CMP.b #$07 : BCC .ignore
-	CMP.b #$37 : BCC .load
-	CMP.b #$3A : BCC .ignore
-	CMP.b #$B6 : BCC .load
-	CMP.b #$C0 : BCC .ignore
-
-.load
 	TAX
 	JSR.w BossPrizeLoadDisplayWideItemFlag : BEQ .ignore
 	LDA.l AddReceivedItemExpanded_x_offsets, X
