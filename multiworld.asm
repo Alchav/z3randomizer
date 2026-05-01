@@ -136,6 +136,8 @@ GetMultiworldItem:
 	+
 	PLA
 
+	; The added current-dungeon key ring cases make some branches exceed 8-bit
+	; range, so near labels trampoline to the original key handling blocks.
 	BRA .checkCurrentDungeonKey
 	.thisdungeon_near
 		BRL .thisdungeon

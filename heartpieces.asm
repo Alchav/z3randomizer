@@ -112,6 +112,8 @@ NormalItemSkipSound:
 
 	LDA $0C5E, X ; thing we wrote over
 	PHA
+	; Shuffled boss prizes keep the victory fanfare even when the prize is not
+	; one of the vanilla pendant/crystal item IDs.
 	JSL.l BossPrizeItemNeedsVictoryFanfare : BCC +
 		PLA
 		JSL Sound_SetSfxPanWithPlayerCoords

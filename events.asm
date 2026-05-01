@@ -241,6 +241,8 @@ PostItemAnimation:
 	LDA.b #$00 : STA !ITEM_BUSY ; mark item as finished
 
 	LDA $7F509F : BEQ +
+		; Boss-prize collection may defer text until its custom finish path, so
+		; leave the message queued while the boss-prize receive context is active.
 		JSL.l BossPrizeReceiveContextMatches : BCS +
 		STZ $1CF0 : STZ $1CF1 ; reset decompression buffer
 		JSL.l Main_ShowTextMessage_Alt

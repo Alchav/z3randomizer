@@ -185,6 +185,7 @@ FreeDungeonItemNotice:
 		PLA : AND.b #$0F : STA $7F5020 : LDA.b #$0F : !SUB $7F5020 : PHA
 		LDA #$01 : STA $7F5010 ; set up a flip for small keys
 		BRA .dungeon
+	; Key rings share the small-key notice flag but use their own text prefix.
 	+ : LDA.l FreeItemText : AND.b #$01 : CMP.b #$01 : BNE + ; show message for dungeon key ring
 	LDA !ITEM_TEMPORARY : AND.b #$F0 : CMP.b #$C0 : BNE + ; key ring of...
 		LDA !ITEM_TEMPORARY : CMP.b #$CE : !BLT .keyRingNotice

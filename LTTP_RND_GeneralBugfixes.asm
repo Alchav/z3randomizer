@@ -175,6 +175,8 @@ incsrc init.asm
 
 org $A48000 ; code bank - PUT NEW CODE HERE
 
+; Current-dungeon key rings are inventory-only rewards. They should add the
+; dungeon's key quantity and update HUD/stats without the normal item fanfare.
 Link_ReceiveItem_HandleCurrentDungeonKeyRing:
 	CPY.b #$CE : BNE .normalReceive
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .normalReceive
@@ -193,6 +195,8 @@ Link_ReceiveItem_HandleCurrentDungeonKeyRing:
 	.fromTextOrObject
 	JML $0799C8
 
+; Grant the current dungeon's key ring directly because the generic receive-item
+; path only handles one concrete item ID at a time.
 ReceiveCurrentDungeonKeyRingQuiet:
 	PHX : PHY
 		LDA $040C : CMP.b #$FF : BEQ .cleanup
@@ -302,6 +306,7 @@ org $31A800
 GFX_New_Items:
 ;incbin newitems.gfx
 ;incbin eventitems.gfx ; *EVENT*
+; 2026 item graphics include the key ring art and keep within the original slot.
 incbin 2026items.gfx
 warnpc $31B000
 

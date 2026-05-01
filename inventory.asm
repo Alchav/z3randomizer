@@ -466,6 +466,7 @@ AddInventory:
 		JSR .incrementPendant
 		JSR .setDungeonCompletion
 		BRL .done
+	; Shuffled boss prizes use ordinary item IDs and still need pendant/crystal counts.
 	+ JSL.l MaybeIncrementOrdinaryBossPrizeCounts : BCC +
 		BRL .done
 	+
@@ -547,6 +548,7 @@ AddInventory:
 	  CPY.b #$B0 : !BGE +
 		JSR .incrementKey
 		BRL .done
+	; Key rings count as key inventory checks for the owning dungeon.
 	+ CPY.b #$C0 : !BLT + ; Items $C0 - $CE - Key Rings
 	  CPY.b #$CF : !BGE +
 		JSR .incrementKey

@@ -900,6 +900,7 @@ LDA.w AddReceivedItemExpanded_item_masks, X
 org $098769 ; 48769 - ancilla_init.asm:1005 (LDA .item_graphics_indices, Y)
 LDA.w AddReceivedItemExpanded_item_graphics_indices, Y
 
+; Let expanded graphics IDs use the variable animated-sprite tile loader.
 org $09878C ; 4878C - ancilla_init.asm:1028 (JSL GetAnimatedSpriteTile.variable)
 JSL.l GetAnimatedSpriteTile_variable
 
@@ -919,12 +920,14 @@ LDA.w AddReceivedItemExpanded_x_offsets, Y
 org $08C6C8 ; 446C8 - ancilla_receive_item.asm:538 (LDA AddReceiveItem.properties, X)
 JSL CheckReceivedItemPropertiesBeforeLoad
 
+; Boss-prize items draw with the resolved display item, not always the stored item ID.
 org $08C6B4 ; 446B4 - ancilla_receive_item.asm:520 alternate draw entry (PHX : LDA $0BF0, X : STA $74)
 JML.l BossPrizeDrawPrep
 NOP #2
 org $08C6BA
 BossPrizeDrawContinue:
 
+; Route shuffled boss-prize swords through the freestanding/sprite source path.
 org $0987BB ; 487BB - ancilla_init.asm (LDA $02E9 : CMP.b #$02 : BEQ .masterSwordFromSprite)
 JML.l BossPrizeMasterSwordSourceCheck
 NOP #3
@@ -942,6 +945,7 @@ JSL CheckReceivedItemPropertiesBeforeLoad
 org $08C70F ; 4470F - ancilla_receive_item.asm : 582 - (LDA.b #$00 : STA ($92), Y)
 JSL.l LoadNarrowObject
 
+; Boss-prize narrow items need the shadow position adjusted after the item body.
 org $08CDF3 ; 44DF3 - ancilla_milestone_item.asm:239 (REP #$20 : LDA $06 : ADD.w #$000C : STA $00)
 JSL.l BossPrizeMilestoneShadowPrep
 NOP #6
@@ -1022,7 +1026,7 @@ JSL.l LockAgahnimDoors : BNE Overworld_Entrance_BRANCH_EPSILON : NOP #6
 org $1BBCC1 ; <- DBCC1 - Bank1B.asm : 223 (LDA $0F8004, X : AND.w #$01FF : STA $00)
 Overworld_Entrance_BRANCH_EPSILON: ; go here to lock doors
 ;--------------------------------------------------------------------------------
-; -- HOOK THIS LATER TO FUCK WITH BOSS DROPS --
+; Replace the boss-room tag so shuffled prizes can spawn ordinary item IDs.
 org $01C709 ; <- C709 - Bank01.asm : 10347
 JSL.l BossPrizeRoomTag
 RTS
@@ -1577,6 +1581,7 @@ org $08C421 ; <- AD4021 F005 - ancilla_receive_item.asm:108 (LDA $2140 : BEQ .wa
 JML PendantFanfareWait : NOP
 PendantFanfareContinue:
 
+; Non-pendant shuffled boss prizes still wait for victory music before finishing.
 org $08C412 ; <- BD5E0C C937 F008 - ancilla_receive_item.asm:101 (LDA $0C5E, X : CMP.b #$37 : BEQ .isPendant)
 JML.l BossPrizePendantWaitCheck
 NOP #11
@@ -1584,6 +1589,7 @@ NOP #11
 org $08C42B
 PendantFanfareDone:
 
+; Crystals spawned by boss-prize shuffle should use the crystal-special branch.
 org $08C61D ; <- BD5E0C C920 - ancilla_receive_item.asm:435 (LDA $0C5E, X : CMP.b #$20)
 JML.l CrystalItemBehaviorCheck
 NOP
@@ -2056,6 +2062,7 @@ org $08C45F ; <- 4445F - ancilla_recieve_item.asm:157 (STZ $02E9 : LDA $0C5E, X)
 Ancilla_ReceiveItem_optimus:
 JML.l PostItemAnimation : NOP #2
 
+; Split receive-item dispatch so boss-prize text/object states can be handled.
 org $08C3D0 ; <- 443D0 - ancilla_receive_item.asm:62 (LDA $0C54, X)
 JML.l BossPrizeReceiveDispatch
 NOP #8
@@ -2066,6 +2073,7 @@ Ancilla_ReceiveItem_return:
 org $08C539
 Ancilla_ReceiveItem_fromChestOrSprite:
 
+; Finish shuffled boss prizes by marking completion and starting the dungeon exit.
 org $08C505 ; <- 44505 - ancilla_receive_item.asm:256 (STZ $0C4A, X : STZ $0FC1)
 JML.l HandleBossPrizeObjectFinished
 NOP #2
@@ -2239,6 +2247,7 @@ BCC Link_ReceiveItem_notHeartContainer
 org $0799BA ; 399BA - Bank07.asm:4070 (LDA.b #$60 : STA $02D9)
 Link_ReceiveItem_notHeartContainer:
 ;--------------------------------------------------------------------------------
+; Current-dungeon key rings are granted quietly by a custom receive-item branch.
 org $0799BF ; 399BF - Bank07.asm:4072 (LDA $02E9 : BEQ .fromTextOrObject)
 JML.l Link_ReceiveItem_HandleCurrentDungeonKeyRing
 NOP #5

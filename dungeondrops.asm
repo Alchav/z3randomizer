@@ -10,12 +10,16 @@
 !BOSS_PRIZE_X_OFFSET_APPLIED = "$7F504E"
 !ITEM_BUSY = "$7F5091"
 
+; Boss prize shuffle tracks one spawned receive-item ancilla so the normal
+; receive-item draw and collection code can identify the shuffled prize path.
 DropSafeDungeon:
 	LDA $040C : CMP #$08 : BEQ +
 		LDA $01C6FC, X : JSL Sprite_SpawnFallingItem
 	+
 RTL
 ;--------------------------------------------------------------------------------
+; Replace the vanilla boss room tag handler. In shuffle mode this spawns the
+; configured item as a falling receive-item object instead of the vanilla prize.
 BossPrizeRoomTag:
 	LDA BossPrizeShuffle : BEQ .vanilla
 	JSL.l CheckIfBossRoom : BCC .vanilla
@@ -64,6 +68,7 @@ BossPrizeRoomTag:
 .heartContainerStillExists
 RTL
 ;--------------------------------------------------------------------------------
+; Mark the current room as owning an active shuffled boss prize.
 SetBossPrizeContext:
 	LDA.b #$01 : STA !BOSS_PRIZE_ACTIVE
 	PHP
@@ -72,6 +77,7 @@ SetBossPrizeContext:
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
+; Clear all state used to recognize and draw the shuffled boss prize ancilla.
 ClearBossPrizeContext:
 	LDA.b #$00
 	STA !BOSS_PRIZE_ACTIVE
@@ -85,6 +91,8 @@ ClearBossPrizeContext:
 	STA !BOSS_PRIZE_X_OFFSET_APPLIED
 RTL
 ;--------------------------------------------------------------------------------
+; Spawn the shuffled prize with vanilla receive-item behavior and preload the
+; display graphics for the resolved item that Link will actually show.
 SpawnBossPrizeFallingItem:
 	PHA
 	JSL.l BossPrizeResolveItem
@@ -102,6 +110,8 @@ SpawnBossPrizeFallingItem:
 	PLA : STA $0C5E, X
 	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
 
+	; Swords and shields need their freestanding/decompressed graphics, while
+	; other items can use the normal received-item graphics index directly.
 	PHX : PHB
 		LDA.b #AddReceivedItemExpanded_item_graphics_indices>>16 : PHA : PLB
 		LDA.w AddReceivedItemExpanded_item_graphics_indices, Y : STA $72
@@ -180,6 +190,7 @@ SpawnBossPrizeFallingItem:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; Temporarily present the resolved sword level to the vanilla sword decompressor.
 BossPrizeDecompResolvedSwordGfx:
 	PHP
 	SEP #$20
@@ -208,6 +219,7 @@ BossPrizeDecompResolvedSwordGfx:
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
+; Temporarily present the resolved shield level to the vanilla shield decompressor.
 BossPrizeDecompResolvedShieldGfx:
 	PHP
 	SEP #$20
@@ -231,6 +243,7 @@ BossPrizeDecompResolvedShieldGfx:
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
+; True when the current room is the room that spawned the active shuffled prize.
 BossPrizeContextMatchesRoom:
 	LDA BossPrizeShuffle : BEQ .mismatch
 	LDA !BOSS_PRIZE_ACTIVE : BEQ .mismatch
@@ -250,6 +263,7 @@ BossPrizeContextMatchesRoom:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; True when X is the receive-item ancilla slot used by the shuffled prize.
 BossPrizeContextMatchesSlot:
 	LDA !BOSS_PRIZE_SLOT : CMP.b #$FF : BEQ .mismatch
 	TXA : CMP !BOSS_PRIZE_SLOT : BNE .mismatch
@@ -260,6 +274,7 @@ BossPrizeContextMatchesSlot:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; True while Link is receiving the tracked shuffled boss prize.
 BossPrizeReceiveContextMatches:
 	LDA $02E9 : CMP.b #$03 : BNE .mismatch
 	JSL.l BossPrizeContextMatchesRoom : BCC .mismatch
@@ -271,6 +286,7 @@ BossPrizeReceiveContextMatches:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; True while the tracked boss-prize ancilla is still being animated.
 BossPrizeObjectContextMatches:
 	LDA $0C54, X : CMP.b #$03 : BNE .mismatch
 	JSL.l BossPrizeContextMatchesRoom : BCC .mismatch
@@ -282,12 +298,14 @@ BossPrizeObjectContextMatches:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; Apply the configured multiworld recipient before the item is granted.
 BossPrizeApplyItemPlayer:
 	JSL.l BossPrizeReceiveContextMatches : BCC .done
 	JSL.l BossPrizeGetPlayer : STA !MULTIWORLD_ITEM_PLAYER_ID
 .done
 RTL
 ;--------------------------------------------------------------------------------
+; Non-pendant shuffled prizes still need the victory fanfare before warping out.
 BossPrizeItemNeedsVictoryFanfare:
 	JSL.l BossPrizeObjectContextMatches : BCC .noFanfare
 	SEC
@@ -297,6 +315,7 @@ BossPrizeItemNeedsVictoryFanfare:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; Extend the pendant music wait to any shuffled boss prize that uses the victory fanfare.
 BossPrizePendantWaitCheck:
 	LDA $0C5E, X : CMP.b #$37 : BEQ .waitForMusic
 	               CMP.b #$38 : BEQ .waitForMusic
@@ -310,6 +329,8 @@ BossPrizePendantWaitCheck:
 .dontWaitForMusic
 	JML.l PendantFanfareDone
 ;--------------------------------------------------------------------------------
+; Finish a shuffled boss prize by marking dungeon completion, showing deferred
+; text if needed, then routing to the dungeon-exit path.
 HandleBossPrizeObjectFinished:
 	JSL.l BossPrizeObjectContextMatches : BCC .normalObjectFinished
 	JSL.l MarkBossPrizeDungeonCompletion
@@ -337,6 +358,7 @@ HandleBossPrizeObjectFinished:
 	STZ $0FC1
 	JML.l Ancilla_ReceiveItem_objectFinished+6
 ;--------------------------------------------------------------------------------
+; Move the item object offscreen while deferred text owns the receive-item state.
 HideBossPrizeItemVisual:
 	PHP
 	REP #$20
@@ -355,6 +377,7 @@ HideBossPrizeItemVisual:
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
+; Record shuffled boss-prize completion separately from vanilla pendant/crystal bits.
 MarkBossPrizeDungeonCompletion:
 	LDA $040C
 	CMP #$FF : BEQ .done
@@ -370,6 +393,7 @@ MarkBossPrizeDungeonCompletion:
 .done
 RTL
 
+; Check the shuffled boss-prize completion bit for the current dungeon.
 BossPrizeDungeonCompletionMatches:
 	LDA $040C
 	CMP #$FF : BEQ .mismatch
@@ -391,6 +415,7 @@ RTL
 	SEC
 RTL
 
+; Convert a dungeon index into a single-bit mask for completion storage.
 BossPrizeValueShift:
 	PHX
 	TAX : LDA.b #$01
@@ -403,6 +428,7 @@ BossPrizeValueShift:
 	PLX
 RTS
 ;--------------------------------------------------------------------------------
+; Resolve progressive/substituted local prizes for display before the item is granted.
 BossPrizeResolveItem:
 	PHA
 	JSL.l BossPrizeGetPlayer : CMP.b #$00 : BEQ .local
@@ -487,6 +513,7 @@ BossPrizeResolveItem:
 	.displayResolved
 		RTL
 ;--------------------------------------------------------------------------------
+; Prepare receive-item drawing to use the resolved boss-prize display item.
 BossPrizeDrawPrep:
 	LDA.b #$00
 	STA !BOSS_PRIZE_NARROW_SHADOW
@@ -515,6 +542,7 @@ BossPrizeDrawPrep:
 	LDA $0BF0, X : STA $74
 	JML.l BossPrizeDrawContinue
 ;--------------------------------------------------------------------------------
+; Undo any boss-prize X adjustment before the milestone-item shadow is drawn.
 BossPrizeMilestoneShadowPrep:
 	SEP #$20
 	LDA !BOSS_PRIZE_X_OFFSET_APPLIED : BEQ .drawShadow
@@ -532,6 +560,7 @@ BossPrizeMilestoneShadowPrep:
 	LDA $06 : CLC : ADC.w #$000C : STA $00
 RTL
 ;--------------------------------------------------------------------------------
+; Match vanilla receive-item X centering for the resolved boss-prize item.
 BossPrizeApplyDisplayXOffset:
 	PHX : PHY
 	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
@@ -549,6 +578,7 @@ BossPrizeApplyDisplayXOffset:
 	PLY : PLX
 RTS
 ;--------------------------------------------------------------------------------
+; Restore the draw X position after the boss-prize item body is drawn.
 BossPrizeUndoDisplayXOffset:
 	PHX : PHY
 	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
@@ -565,6 +595,7 @@ BossPrizeUndoDisplayXOffset:
 	PLY : PLX
 RTS
 ;--------------------------------------------------------------------------------
+; Treat freestanding swords as wide sprites even though their item IDs bypass the table.
 BossPrizeLoadDisplayWideItemFlag:
 	TXA
 	CMP.b #$49 : BEQ .wideSword
@@ -579,6 +610,7 @@ BossPrizeLoadDisplayWideItemFlag:
 	LDA.b #$02
 RTS
 ;--------------------------------------------------------------------------------
+; Load the display item's X offset, ignoring offsets for narrow item layouts.
 BossPrizeLoadDisplayXOffset:
 	TYA
 	TAX
@@ -590,6 +622,7 @@ BossPrizeLoadDisplayXOffset:
 	LDA.b #$04
 RTS
 ;--------------------------------------------------------------------------------
+; Use the resolved display item when the upper tile of a boss-prize object is drawn.
 BossPrizeShiftUpperItemTileAndLoadWideItemFlag:
 	PHX : PHY
 	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .normalItem
@@ -611,6 +644,7 @@ BossPrizeShiftUpperItemTileAndLoadWideItemFlag:
 	PLY : PLX
 RTL
 ;--------------------------------------------------------------------------------
+; Store the resolved display item's narrow/wide flag into the OAM size buffer.
 BossPrizeLoadNarrowObject:
 	PHX : PHY
 	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .normalItem
@@ -633,6 +667,7 @@ BossPrizeLoadNarrowObject:
 	PLY : PLX
 RTL
 ;--------------------------------------------------------------------------------
+; Boss-prize swords should use the sprite/freestanding source path, not the held-up source.
 BossPrizeMasterSwordSourceCheck:
 	LDA $02E9 : CMP.b #$02 : BEQ .spriteSource
 	JSL.l BossPrizeReceiveContextMatches : BCS .spriteSource
@@ -641,6 +676,7 @@ BossPrizeMasterSwordSourceCheck:
 .spriteSource
 	JML.l BossPrizeMasterSwordFromSprite
 ;--------------------------------------------------------------------------------
+; Show "free dungeon item" text for local shuffled boss prizes after substitution.
 BossPrizeQueueFreeItemNotice:
 	JSL.l BossPrizeReceiveContextMatches : BCC .done
 	JSL.l BossPrizeGetPlayer : CMP.b #$00 : BNE .done
@@ -648,6 +684,7 @@ BossPrizeQueueFreeItemNotice:
 .done
 RTL
 ;--------------------------------------------------------------------------------
+; Avoid spawning the prize while another receive-item ancilla is still active.
 BossPrizeSpawnReady:
 	LDX.b #$09
 
@@ -661,6 +698,7 @@ BossPrizeSpawnReady:
 	CLC
 	RTL
 ;--------------------------------------------------------------------------------
+; Route boss-prize receive states through object/text handling and wait for text close.
 BossPrizeReceiveDispatch:
 	LDA $0C54, X : BEQ .fromTextOrObject
 	CMP.b #$03 : BEQ .fromTextOrObject
@@ -687,6 +725,7 @@ BossPrizeReceiveDispatch:
 	LDA.b #$01 : STA $0FC1
 	JML.l Ancilla_ReceiveItem_return
 ;--------------------------------------------------------------------------------
+; Ordinary pendant/crystal item IDs collected outside boss rooms still set vanilla bits.
 MaybeSetOrdinaryBossPrizeBits:
 	CMP.b #$B6 : BNE +
 		LDA $7EF374 : ORA.b #$04 : STA $7EF374
@@ -722,6 +761,7 @@ MaybeSetOrdinaryBossPrizeBits:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; Count ordinary pendant/crystal item IDs for inventory and stats displays.
 MaybeIncrementOrdinaryBossPrizeCounts:
 	CPY.b #$B6 : BCC .miss
 	CPY.b #$B9 : BCS .checkCrystals
@@ -743,6 +783,7 @@ MaybeIncrementOrdinaryBossPrizeCounts:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
+; Map the current boss room to its configured shuffled prize item.
 LoadBossPrizeRoomValue:
 	PHP
 	REP #$20 ; set 16-bit accumulator
@@ -785,6 +826,7 @@ LoadBossPrizeRoomValue:
 	PLP
 RTL
 ;--------------------------------------------------------------------------------
+; Map the current boss room to the configured multiworld recipient.
 BossPrizeGetPlayer:
 	PHP
 	REP #$20 ; set 16-bit accumulator

@@ -1968,11 +1968,13 @@ db #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00, #$00,
 
 ; 0x186390 - 18639F
 org $30E390 ; PC 0x186390
+; Number of small keys awarded by each dungeon key ring, indexed by dungeon ID.
 KeyRingQuantities:
 db $04, $04, $02, $04, $04, $06, $06, $06, $05, $06, $01, $03, $06, $08, $00, $00
 
 ;--------------------------------------------------------------------------------
 org $30E3A0 ; PC 0x1863A0 - 0x1863A9
+; Multiworld player IDs for each shuffled boss prize, indexed in boss-room order.
 BossPrize_ArmosKnights_Player:
 db #$00
 BossPrize_Lanmolas_Player:

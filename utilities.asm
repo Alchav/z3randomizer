@@ -3,6 +3,8 @@
 ;================================================================================
 !PROGRESSIVE_SHIELD = "$7EF416" ; ss-- ----
 !BEE_TRAP_DISGUISE = "$7EF4DA"
+; Dynamic ground-sprite graphics IDs. This table is not the same ID space as
+; received/held-up item graphics.
 !SINGLE_ARROW_SPRITE_GFX = $33
 !KEY_RING_SPRITE_GFX = $41
 ;--------------------------------------------------------------------------------
@@ -176,6 +178,7 @@ RTL
 	db $49, $23, $23, $23, $28, $28, $28, $28, $28, $28, $28 ; Unused, Pendants, Crystals
 	
 	;Cx
+	; Key rings use the dynamic slot where the Silver Arrow graphic is stored.
 	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX ; Key Ring
 	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
 	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
@@ -494,6 +497,7 @@ RTS
 ;--------------------------------------------------------------------------------
 DrawDynamicTile:
 		JSR PrepDrawRemoteItemSprite
+		; Crystals can appear as ordinary ground sprites when boss prizes shuffle.
 		JSL.l MaybeLoadCrystalSpritePalette
 
 		JSL.l IsNarrowSprite : BCS .narrow
@@ -526,6 +530,7 @@ RTL
 ;--------------------------------------------------------------------------------
 DrawDynamicTileNoShadow:
 		JSR PrepDrawRemoteItemSprite
+		; Shadowless dynamic draws need the same crystal palette preload.
 		JSL.l MaybeLoadCrystalSpritePalette
 
 		JSL.l IsNarrowSprite : BCS .narrow

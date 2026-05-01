@@ -161,6 +161,8 @@ KeyGet:
 			+ cmp #$af : beq - ; universal key
 			cmp #$24 : beq -   ; small key for this dungeon
 			cmp #$CE : bne +   ; small key ring for this dungeon
+				; Current-dungeon key rings add the configured quantity to the
+				; saved key count before the normal key pickup returns.
 				lda.l KeyRingQuantities, x : beq -
 				clc : adc $02, S : dec
 				sta $02, S

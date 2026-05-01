@@ -269,6 +269,7 @@ CountChestKey: ; called by neighbor functions
 			CPY #$A0 : !BLT .checkKeyRing ; Ignore most items
 			CPY #$AE : !BLT .dungeonKey ; Count dungeon small keys
 		.checkKeyRing
+			; Dungeon-specific key rings count as key checks for the owning dungeon.
 			CPY #$C0 : !BLT .end
 			CPY #$CE : !BGE .end ; Ignore reserved key ring slots
 		.dungeonKey
@@ -297,6 +298,7 @@ CountBonkItem: ; called from GetBonkItem in bookofmudora.asm
 	CMP #$A0 : !BLT .checkKeyRing
 	CMP #$AE : !BLT .count
 	.checkKeyRing
+	; Bonk/dig style key drops can also resolve to key rings.
 	CMP #$C0 : !BLT +
 	CMP #$CE : !BGE +
 	.count

@@ -425,6 +425,8 @@ AddReceivedItemExpandedGetItem:
 	+ CMP.b #$C0 : !BLT + : CMP.b #$D0 : !BGE + ; Key Ring
 		AND #$0F : TAX
 		.keyRingCount
+		; Key rings add the configured quantity for their dungeon and mirror the
+		; HC/Sewers shared key count behavior used by single keys.
 		LDA.l KeyRingQuantities, X : BEQ .keyRingDone
 		PHA
 		CLC : ADC $7EF37C, X : STA $7EF37C, X
@@ -496,6 +498,8 @@ RTL
 !SINGLE_INDEX_BITMASK_TEMP = "$7F5022"
 !LOCK_IN = "$7F5090"
 !ITEM_BUSY = "$7F5091"
+; Received-item graphics IDs are separate from dynamic ground-sprite IDs.
+; Key rings reuse the former Silver Arrow slot; Silver Arrows use single-arrow art.
 !SINGLE_ARROW_RECEIVED_ITEM_GFX = $33
 !KEY_RING_RECEIVED_ITEM_GFX = $41
 ;2B:Bottle Already Filled w/ Red Potion
@@ -507,6 +511,8 @@ RTL
 AddReceivedItemExpanded:
 {
 	PHA : PHX
+		; Boss prizes may be remote items, so set the recipient before normal
+		; local/remote inventory handling runs.
 		JSL.l BossPrizeApplyItemPlayer
 		LDA RemoteItems : BEQ + : LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 			LDA $02E9 : BEQ ++ : CMP #$03 : BNE +++ : ++
@@ -529,6 +535,8 @@ AddReceivedItemExpanded:
 
 			JSR IncrementItemCounters
 		+
+		; Boss-prize display items are resolved before collection, so queue any
+		; free-dungeon-item notice after substitution.
 		JSL.l BossPrizeQueueFreeItemNotice
 		LDA $02D8 ; Item Value
 		
@@ -1228,6 +1236,7 @@ AttemptItemSubstitution:
 	PLA : PLX
 RTS
 ;--------------------------------------------------------------------------------
+; Long-call wrapper for boss-prize code that lives outside this bank.
 AttemptItemSubstitutionLong:
 	JSR AttemptItemSubstitution
 RTL

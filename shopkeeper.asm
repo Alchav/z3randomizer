@@ -682,6 +682,8 @@ Shopkeeper_BuyItem:
 		LDA !SHOP_TYPE : AND.b #$80 : BEQ + : BRL .buy : + ; don't charge if this is a take-any
 
 		.custom_price
+		; High bit marks non-rupee prices; split that path so rupee prices keep
+		; the vanilla 16-bit rupee comparison below.
 		LDA !SHOP_INVENTORY+2, X : AND.b #$80 : BNE .price_is_not_rupees ; i honestly can't think of a better way to do this block because i haven't done asm in like 8 months
 		 		JMP .price_is_rupees
 			.price_is_not_rupees

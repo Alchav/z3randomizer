@@ -1,3 +1,5 @@
+; Load received-item palette properties, using the boss-prize display item when
+; the receive animation is showing a substituted/progressive prize.
 CheckReceivedItemPropertiesBeforeLoad:
     PHX
     LDA $7F504C : BEQ +
@@ -36,6 +38,8 @@ CheckReceivedItemPropertiesBeforeLoad:
     LDA #$00
     RTL
 
+    ; Swords and shields use inventory-dependent palette properties, so boss
+    ; prizes need the resolved display item rather than the original item ID.
     .loadProperty
     LDA $7F504C : BEQ .normalProperty
     TXA : CMP.b #$49 : BEQ .masterSword
@@ -66,6 +70,8 @@ CheckReceivedItemPropertiesBeforeLoad:
     LDA.b #$05
     RTS
 
+; Boss-prize crystals are spawned as ordinary receive-item objects, but still
+; need the crystal-specific fanfare/state path once they are collected.
 CrystalItemBehaviorCheck:
     LDA $0C5E, X : CMP.b #$20 : BNE .ordinaryItem
     LDA $0C54, X : CMP.b #$03 : BEQ .bossPrizeCrystal
@@ -76,6 +82,8 @@ CrystalItemBehaviorCheck:
 .bossPrizeCrystal
     JML.l CrystalSpecialBehaviorContinue
 
+; Dynamic/freestanding crystals need SP6 loaded before draw, unlike most items
+; whose palettes are already present in the normal received-item path.
 MaybeLoadCrystalSpritePalette:
     PHA
     CMP.b #$20 : BEQ .loadPalette
