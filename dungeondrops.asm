@@ -118,6 +118,13 @@ SpawnBossPrizeFallingItem:
 		CMP.b #$2E : BNE .getItemTiles
 
 		.shieldItem
+			TYA
+			JSL.l GetSpriteID
+			STA $72
+			JSL.l BossPrizeDecompResolvedShieldGfx
+			LDA $72
+			BRA .getItemTiles
+
 		.freestandingSwordItem
 			TYA
 			JSL.l GetSpriteID
@@ -198,6 +205,29 @@ BossPrizeDecompResolvedSwordGfx:
 	JSL.l DecompSwordGfx
 	JSL.l Palette_Sword
 	PLA : STA $7EF359
+	PLP
+RTL
+;--------------------------------------------------------------------------------
+BossPrizeDecompResolvedShieldGfx:
+	PHP
+	SEP #$20
+	LDA $7EF35A : PHA
+	LDA !BOSS_PRIZE_DISPLAY_ITEM
+	CMP.b #$04 : BEQ .fighterShield
+	CMP.b #$05 : BEQ .redShield
+	LDA.b #$03 : BRA .loadShield
+
+.fighterShield
+	LDA.b #$01 : BRA .loadShield
+
+.redShield
+	LDA.b #$02
+
+.loadShield
+	STA $7EF35A
+	JSL.l DecompShieldGfx
+	JSL.l Palette_Shield
+	PLA : STA $7EF35A
 	PLP
 RTL
 ;--------------------------------------------------------------------------------

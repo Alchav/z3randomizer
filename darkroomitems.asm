@@ -38,24 +38,32 @@ CheckReceivedItemPropertiesBeforeLoad:
 
     .loadProperty
     LDA $7F504C : BEQ .normalProperty
-    TXA : CMP.b #$04 : BEQ .blueShield
-          CMP.b #$05 : BEQ .blueShield
-          CMP.b #$06 : BEQ .mirrorShield
+    TXA : CMP.b #$49 : BEQ .masterSword
+          CMP.b #$01 : BEQ .masterSword
+          CMP.b #$50 : BEQ .masterSword
+          CMP.b #$02 : BEQ .temperedSword
+          CMP.b #$03 : BEQ .goldenSword
+          CMP.b #$04 : BCC .normalProperty
+          CMP.b #$07 : BCC .shield
 
     .normalProperty
     LDA.l AddReceivedItemExpanded_properties, X ; Restore Rando Code
     RTS
 
-    .blueShield
+    .masterSword
     LDA.b #$02
     RTS
 
-    .redShield
+    .temperedSword
     LDA.b #$01
     RTS
 
-    .mirrorShield
+    .goldenSword
     LDA.b #$04
+    RTS
+
+    .shield
+    LDA.b #$05
     RTS
 
 CrystalItemBehaviorCheck:
