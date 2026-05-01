@@ -180,6 +180,7 @@ org $A48000 ; code bank - PUT NEW CODE HERE
 Link_ReceiveItem_HandleCurrentDungeonKeyRing:
 	CPY.b #$CE : BNE .normalReceive
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .normalReceive
+	JSL.l BossPrizeReceiveContextMatches : BCS .normalReceive
 	JSL.l ReceiveCurrentDungeonKeyRingQuiet
 	JSL.l Player_HaltDashAttackLong
 	CLC

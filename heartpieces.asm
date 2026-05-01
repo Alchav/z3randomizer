@@ -108,8 +108,6 @@ NormalItemSkipSound:
 		RTL
 	+
 
-	CPY.b #$CE : BEQ .skipSound ; Skip the current-dungeon key ring pickup fanfare
-
 	LDA $0C5E, X ; thing we wrote over
 	PHA
 	; Shuffled boss prizes keep the victory fanfare even when the prize is not
@@ -122,6 +120,8 @@ NormalItemSkipSound:
 		RTL
 	+
 	PLA
+	CPY.b #$CE : BEQ .skipSound ; Skip the current-dungeon key ring pickup fanfare
+
 	CMP.b #$3E : BEQ +
 	CLC
 	RTL
