@@ -96,6 +96,7 @@ RTL
 SpawnBossPrizeFallingItem:
 	PHA
 	JSL.l BossPrizeResolveItem
+	JSL.l BossPrizeResolvePrizeLocationDisplayItem
 	STA !BOSS_PRIZE_DISPLAY_ITEM
 	PLA : PHA
 
@@ -512,6 +513,24 @@ BossPrizeResolveItem:
 
 	.displayResolved
 		RTL
+;--------------------------------------------------------------------------------
+; Boss-prize Null/trap items use the blank received-item graphic. Show a random
+; ordinary item graphic at the prize location while keeping the real item ID.
+BossPrizeResolvePrizeLocationDisplayItem:
+	PHA : PHY : PHB
+		TAY
+		LDA.b #AddReceivedItemExpanded_item_graphics_indices>>16 : PHA : PLB
+		LDA.w AddReceivedItemExpanded_item_graphics_indices, Y
+		CMP.b #$47 : BEQ .randomDisguise
+	PLB : PLY : PLA
+RTL
+
+.randomDisguise
+	PLB : PLY : PLA
+	JSL.l GetRandomInt : AND.b #$3F
+	BNE + : LDA.b #$49 : +
+	CMP.b #$26 : BNE + : LDA.b #$6A : +
+RTL
 ;--------------------------------------------------------------------------------
 ; Prepare receive-item drawing to use the resolved boss-prize display item.
 BossPrizeDrawPrep:
