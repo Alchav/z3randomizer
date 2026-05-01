@@ -39,7 +39,7 @@ CheckReceivedItemPropertiesBeforeLoad:
     .loadProperty
     LDA $7F504C : BEQ .normalProperty
     TXA : CMP.b #$04 : BEQ .blueShield
-          CMP.b #$05 : BEQ .redShield
+          CMP.b #$05 : BEQ .blueShield
           CMP.b #$06 : BEQ .mirrorShield
 
     .normalProperty

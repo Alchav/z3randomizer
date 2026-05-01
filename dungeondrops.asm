@@ -7,6 +7,7 @@
 !BOSS_PRIZE_NARROW_SHADOW = "$7F504B"
 !BOSS_PRIZE_DRAW_ACTIVE = "$7F504C"
 !BOSS_PRIZE_DISPLAY_ITEM = "$7F504D"
+!BOSS_PRIZE_X_OFFSET_APPLIED = "$7F504E"
 !ITEM_BUSY = "$7F5091"
 
 DropSafeDungeon:
@@ -81,6 +82,7 @@ ClearBossPrizeContext:
 	STA !BOSS_PRIZE_NARROW_SHADOW
 	STA !BOSS_PRIZE_DRAW_ACTIVE
 	STA !BOSS_PRIZE_DISPLAY_ITEM
+	STA !BOSS_PRIZE_X_OFFSET_APPLIED
 RTL
 ;--------------------------------------------------------------------------------
 SpawnBossPrizeFallingItem:
@@ -104,10 +106,19 @@ SpawnBossPrizeFallingItem:
 		LDA.b #AddReceivedItemExpanded_item_graphics_indices>>16 : PHA : PLB
 		LDA.w AddReceivedItemExpanded_item_graphics_indices, Y : STA $72
 		CMP.b #$FF : BEQ .invalidItem
+		TYA
+		CMP.b #$49 : BEQ .freestandingSwordItem
+		CMP.b #$01 : BEQ .freestandingSwordItem
+		CMP.b #$50 : BEQ .freestandingSwordItem
+		CMP.b #$02 : BEQ .freestandingSwordItem
+		CMP.b #$03 : BEQ .freestandingSwordItem
+		LDA $72
 		CMP.b #$20 : BEQ .shieldItem
 		CMP.b #$2D : BEQ .shieldItem
 		CMP.b #$2E : BNE .getItemTiles
-	.shieldItem
+
+		.shieldItem
+		.freestandingSwordItem
 			TYA
 			JSL.l GetSpriteID
 			STA $72
@@ -121,7 +132,7 @@ SpawnBossPrizeFallingItem:
 
 		LDA $72 : CMP.b #$06 : BEQ .swordItem
 		          CMP.b #$18 : BNE .notSwordItem
-	.swordItem
+		.swordItem
 			JSL.l BossPrizeDecompResolvedSwordGfx
 		.notSwordItem
 	PLB : PLX
@@ -450,16 +461,21 @@ BossPrizeDrawPrep:
 	LDA.b #$00
 	STA !BOSS_PRIZE_NARROW_SHADOW
 	STA !BOSS_PRIZE_DRAW_ACTIVE
+	STA !BOSS_PRIZE_X_OFFSET_APPLIED
 	LDA $0C4A, X : CMP.b #$29 : BNE .restore
 	JSL.l BossPrizeContextMatchesRoom : BCC .restore
 	JSL.l BossPrizeContextMatchesSlot : BCC .restore
 	LDA.b #$01 : STA !BOSS_PRIZE_DRAW_ACTIVE
-	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
-	LDA.w AddReceivedItemExpanded_wide_item_flag, Y : BNE .restore
+	PHX
+	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAX
+	JSR.w BossPrizeLoadDisplayWideItemFlag
+	PLX
+	CMP.b #$00 : BEQ .narrowItem
+	JSR.w BossPrizeApplyDisplayXOffset
+	BRA .restore
+
+.narrowItem
 	LDA.b #$01 : STA !BOSS_PRIZE_NARROW_SHADOW
-	REP #$20
-	LDA $02 : CLC : ADC.w #$0008 : STA $02
-	SEP #$20
 
 .restore
 	REP #$20
@@ -471,11 +487,13 @@ BossPrizeDrawPrep:
 ;--------------------------------------------------------------------------------
 BossPrizeMilestoneShadowPrep:
 	SEP #$20
+	LDA !BOSS_PRIZE_X_OFFSET_APPLIED : BEQ .drawShadow
+		JSR.w BossPrizeUndoDisplayXOffset
+
+.drawShadow
 	LDA !BOSS_PRIZE_NARROW_SHADOW : BEQ .prepShadowY
 		LDX.b #$02
-		REP #$20
-		LDA $02 : SEC : SBC.w #$0008 : STA $02
-		BRA .shadowYReady
+		BRA .prepShadowY
 
 .prepShadowY
 	REP #$20
@@ -484,19 +502,90 @@ BossPrizeMilestoneShadowPrep:
 	LDA $06 : CLC : ADC.w #$000C : STA $00
 RTL
 ;--------------------------------------------------------------------------------
+BossPrizeApplyDisplayXOffset:
+	PHX : PHY
+	JSR.w BossPrizeLoadDisplayXOffset
+	BEQ .shiftRight
+	BRA .done
+
+.shiftRight
+	LDA.b #$01 : STA !BOSS_PRIZE_X_OFFSET_APPLIED
+	REP #$20
+	LDA $02 : CLC : ADC.w #$0001 : STA $02
+	SEP #$20
+
+.done
+	PLY : PLX
+RTS
+;--------------------------------------------------------------------------------
+BossPrizeUndoDisplayXOffset:
+	PHX : PHY
+	LDA !BOSS_PRIZE_DISPLAY_ITEM : TAY
+	JSR.w BossPrizeLoadDisplayXOffset
+	BEQ .shiftLeft
+	BRA .done
+
+.shiftLeft
+	REP #$20
+	LDA $02 : SEC : SBC.w #$0001 : STA $02
+	SEP #$20
+
+.done
+	PLY : PLX
+RTS
+;--------------------------------------------------------------------------------
+BossPrizeLoadDisplayWideItemFlag:
+	TXA
+	CMP.b #$49 : BEQ .wideSword
+	CMP.b #$01 : BEQ .wideSword
+	CMP.b #$50 : BEQ .wideSword
+	CMP.b #$02 : BEQ .wideSword
+	CMP.b #$03 : BEQ .wideSword
+	LDA.l AddReceivedItemExpanded_wide_item_flag, X
+	RTS
+
+.wideSword
+	LDA.b #$02
+RTS
+;--------------------------------------------------------------------------------
+BossPrizeLoadDisplayXOffset:
+	TYA
+	CMP.b #$20 : BEQ .ignore
+	CMP.b #$04 : BCC .load
+	CMP.b #$07 : BCC .ignore
+	CMP.b #$37 : BCC .load
+	CMP.b #$3A : BCC .ignore
+	CMP.b #$B6 : BCC .load
+	CMP.b #$C0 : BCC .ignore
+
+.load
+	TAX
+	JSR.w BossPrizeLoadDisplayWideItemFlag : BEQ .ignore
+	LDA.l AddReceivedItemExpanded_x_offsets, X
+	RTS
+
+.ignore
+	LDA.b #$04
+RTS
+;--------------------------------------------------------------------------------
 BossPrizeShiftUpperItemTileAndLoadWideItemFlag:
 	PHX : PHY
 	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .normalItem
 		LDA !BOSS_PRIZE_DISPLAY_ITEM : TAX
-		LDA.l AddReceivedItemExpanded_wide_item_flag, X : CMP.b #$02 : BEQ .loadWideFlag
+		JSR.w BossPrizeLoadDisplayWideItemFlag : CMP.b #$02 : BEQ .done
 
+	.narrowItem
 		TYA : ASL #2 : TAY
 		LDA ($90), Y : CLC : ADC.b #$04 : STA ($90), Y
+		LDA !BOSS_PRIZE_DISPLAY_ITEM : TAX
 		BRA .loadWideFlag
 
 .normalItem
 .loadWideFlag
 	LDA.l AddReceivedItemExpanded_wide_item_flag, X
+	BRA .done
+
+.done
 	PLY : PLX
 RTL
 ;--------------------------------------------------------------------------------
@@ -504,13 +593,14 @@ BossPrizeLoadNarrowObject:
 	PHX : PHY
 	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .normalItem
 		LDA !BOSS_PRIZE_DISPLAY_ITEM : TAX
-		BRA .loadWideFlag
+		JSR.w BossPrizeLoadDisplayWideItemFlag
+		BRA .storeWideFlag
 
 .normalItem
-	TXA
+	LDA.l AddReceivedItemExpanded_wide_item_flag, X
 
-.loadWideFlag
-	LDA.l AddReceivedItemExpanded_wide_item_flag, X : STA ($92), Y
+.storeWideFlag
+	STA ($92), Y
 	CMP.b #$02 : BEQ .done
 	LDA !BOSS_PRIZE_DRAW_ACTIVE : BEQ .done
 
