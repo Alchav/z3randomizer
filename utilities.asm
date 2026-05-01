@@ -3,6 +3,8 @@
 ;================================================================================
 !PROGRESSIVE_SHIELD = "$7EF416" ; ss-- ----
 !BEE_TRAP_DISGUISE = "$7EF4DA"
+!SINGLE_ARROW_SPRITE_GFX = $33
+!KEY_RING_SPRITE_GFX = $41
 ;--------------------------------------------------------------------------------
 ; GetSpriteTile
 ; in:	A - Loot ID
@@ -142,7 +144,7 @@ RTL
 	db $44 ; Safe Master Sword
 	db $3D, $3E, $3F, $40 ; Bomb & Arrow +5/+10
 	db $2C, $00, $00 ; 3x Programmable Item
-	db $41 ; Upgrade-Only Silver Arrows
+	db !SINGLE_ARROW_SPRITE_GFX ; Upgrade-Only Silver Arrows
 	db $24 ; 1 Rupoor
 	db $47 ; Null Item
 	db $48, $48, $48 ; Red, Blue & Green Clocks
@@ -174,7 +176,10 @@ RTL
 	db $49, $23, $23, $23, $28, $28, $28, $28, $28, $28, $28 ; Unused, Pendants, Crystals
 	
 	;Cx
-	db $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47 ; Key Ring
+	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX ; Key Ring
+	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
+	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
+	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Reserved
@@ -382,7 +387,7 @@ IsNarrowSprite:
 	LDX.b #$00 ; set index counter to 0
 	;----
 	-
-	CPX.b #$24 : !BGE .false ; finish if we've done the whole list
+	CPX.b #$25 : !BGE .false ; finish if we've done the whole list
 	CMP.l .smallSprites, X : BNE + ; skip to next if we don't match
 	;--
 	SEC ; set true state
@@ -403,9 +408,9 @@ RTL
 	.smallSprites
 	db $04, $07, $08, $09, $0A, $0B, $0C, $13
 	db $15, $18, $24, $2A, $34, $35, $36, $42
-	db $43, $45, $59, $A0, $A1, $A2, $A3, $A4
-	db $A5, $A6, $A7, $A8, $A9, $AA, $AB, $AC
-	db $AD, $AE, $AF, $B3
+	db $43, $45, $58, $59, $A0, $A1, $A2, $A3
+	db $A4, $A5, $A6, $A7, $A8, $A9, $AA, $AB
+	db $AC, $AD, $AE, $AF, $B3
 }
 ;--------------------------------------------------------------------------------
 

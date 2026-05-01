@@ -496,6 +496,8 @@ RTL
 !SINGLE_INDEX_BITMASK_TEMP = "$7F5022"
 !LOCK_IN = "$7F5090"
 !ITEM_BUSY = "$7F5091"
+!SINGLE_ARROW_RECEIVED_ITEM_GFX = $33
+!KEY_RING_RECEIVED_ITEM_GFX = $41
 ;2B:Bottle Already Filled w/ Red Potion
 ;2C:Bottle Already Filled w/ Green Potion
 ;2D:Bottle Already Filled w/ Blue Potion
@@ -657,7 +659,7 @@ AddReceivedItemExpanded:
 	db -5 ; Master Sword (Safe)
 	db -4, -4, -4, -4 ; +5/+10 Bomb Arrows
 	db -4, -4, -4 ; 3x Programmable Item
-	db -4 ; Upgrade-Only Sivler Arrows
+	db -2 ; Upgrade-Only Sivler Arrows
 	db -4 ; 1 Rupoor
 	db -4 ; Null Item
 	db -4, -4, -4 ; Red, Blue & Green Clocks
@@ -739,7 +741,7 @@ AddReceivedItemExpanded:
 	db $18 ; Master Sword (Safe)
 	db $3D, $3E, $3F, $40 ; +5/+10 Bomb Arrows
 	db $00, $00, $00 ; 3x Programmable Item
-	db $41 ; Upgrade-Only Sivler Arrows
+	db !SINGLE_ARROW_RECEIVED_ITEM_GFX ; Upgrade-Only Sivler Arrows
 	db $24 ; 1 Rupoor
 	db $47 ; Null Item
 	db $48, $48, $48 ; Red, Blue & Green Clocks
@@ -761,7 +763,10 @@ AddReceivedItemExpanded:
 	db $47 ; Bee Trap
 	db $47, $2C, $47, $47 ; Fae, Bee, Jar, Apple
 	db $47, $23, $23, $23, $28, $28, $28, $28, $28, $28, $28 ; Unused, Pendants, Crystals
-	db $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47, $47 ; Key Ring
+	db !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX ; Key Ring
+	db !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX
+	db !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX
+	db !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX, !KEY_RING_RECEIVED_ITEM_GFX
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 
@@ -785,7 +790,7 @@ AddReceivedItemExpanded:
 	db $00 ; Master Sword (Safe)
 	db $02, $02, $02, $02 ; +5/+10 Bomb Arrows
 	db $02, $02, $02 ; 3x Programmable Item
-	db $02 ; Upgrade-Only Sivler Arrows
+	db $00 ; Upgrade-Only Sivler Arrows
 	db $00 ; 1 Rupoor
 	db $02 ; Null Item
 	db $02, $02, $02 ; Red, Blue & Green Clocks
