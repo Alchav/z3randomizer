@@ -7,8 +7,6 @@ from asar import init as asar_init, close as asar_close, patch as asar_patch, ge
     getprints as asar_prints, getwarnings as asar_warnings
 
 JAP10HASH = '03a63945398191337e896e5771f77173'
-MAX_ERRORS_TO_PRINT = 100
-MAX_WARNINGS_TO_PRINT = 50
 
 
 def int16_as_bytes(value):
@@ -50,19 +48,6 @@ local_path.cached_path = None
 def generate_patch(baserombytes: bytes, rom: bytes) -> bytes:
     return bsdiff4.diff(bytes(baserombytes), rom)
 
-
-def print_messages(label, messages, limit):
-    print(f"\n{label}: {len(messages)}")
-    for message in messages[:limit]:
-        print(message)
-    remaining = len(messages) - limit
-    if remaining > 0:
-        print(f"... omitted {remaining} additional {label.lower()}")
-
-
-def is_deprecation_warning(message):
-    return "DEPRECATION NOTIFICATION" in message
-
 if __name__ == '__main__':
     try:
         asar_init()
@@ -100,10 +85,13 @@ if __name__ == '__main__':
                 f.write(generate_patch(old_rom_data, new_rom_data))
         else:
             errors = asar_errors()
-            print_messages("Errors", errors, MAX_ERRORS_TO_PRINT)
-        warnings = [warning for warning in asar_warnings() if not is_deprecation_warning(warning)]
-        if warnings:
-            print_messages("Warnings", warnings, MAX_WARNINGS_TO_PRINT)
+            print("\nErrors: " + str(len(errors)))
+            for error in errors:
+                print(error)
+        warnings = asar_warnings()
+        print("\nWarnings: " + str(len(warnings)))
+        for w in warnings:
+            print(w)
 
         asar_close()
     except:
