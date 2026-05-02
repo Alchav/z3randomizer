@@ -27,11 +27,8 @@ CheckGanonVulnerability:
 	+ : CMP #$01 : BEQ .fail
 		;#$01 = On
 	+ : CMP #$02 : BNE +
-		;#$02 = Require All Dungeons
-		LDA $7EF374 : AND.b #$07 : CMP #$07 : BNE .fail ; require all pendants
-		LDA $7EF37A : AND.b #$7F : CMP #$7F : BNE .fail ; require all crystals
-		LDA $7EF3C5 : CMP.b #$03 : !BLT .fail ; require post-aga world state
-		LDA $7EF2DB : AND.b #$20 : CMP #$20 : BNE .fail ; require aga2 defeated (pyramid hole open)
+		;#$02 = Require Number of Dungeons
+		JSL CheckEnoughDungeonsForGanon : !BLT .fail ; require specified number of boss rooms/Aga fights
 		BRA .success
 	+ : CMP #$04 : BNE +
 		;#$04 = Require Crystals
@@ -79,7 +76,30 @@ CheckEnoughCrystalsForGanon:
 	PHX : PHY
 	LDA $7EF37A : JSL CountBits ; the comparison is against 1 less
 	PLY : PLX
-	CMP.l NumberOfCrystalsRequiredForGanon
+	CMP.l GanonRequirementCount
+RTL
+;--------------------------------------------------------------------------------
+CheckEnoughDungeonsForGanon:
+	PHX : PHY
+	LDX.b #$00
+
+	LDA.l $7EF191 : AND.b #$08 : BEQ + : INX : + ; Eastern Palace / Armos Knights
+	LDA.l $7EF067 : AND.b #$08 : BEQ + : INX : + ; Desert Palace / Lanmolas
+	LDA.l $7EF00F : AND.b #$08 : BEQ + : INX : + ; Tower of Hera / Moldorm
+	LDA.l $7EF0B5 : AND.b #$08 : BEQ + : INX : + ; Palace of Darkness / Helmasaur King
+	LDA.l $7EF00D : AND.b #$08 : BEQ + : INX : + ; Swamp Palace / Arrghus
+	LDA.l $7EF053 : AND.b #$08 : BEQ + : INX : + ; Skull Woods / Mothula
+	LDA.l $7EF159 : AND.b #$08 : BEQ + : INX : + ; Thieves' Town / Blind
+	LDA.l $7EF1BD : AND.b #$08 : BEQ + : INX : + ; Ice Palace / Kholdstare
+	LDA.l $7EF121 : AND.b #$08 : BEQ + : INX : + ; Misery Mire / Vitreous
+	LDA.l $7EF149 : AND.b #$08 : BEQ + : INX : + ; Turtle Rock / Trinexx
+
+	LDA.l $7EF3C5 : CMP.b #$03 : !BLT + : INX : + ; Agahnim 1
+	LDA.l $7EF2DB : AND.b #$20 : BEQ + : INX : + ; Agahnim 2
+
+	TXA
+	PLY : PLX
+	CMP.l GanonRequirementCount
 RTL
 ;--------------------------------------------------------------------------------
 CheckEnoughCrystalsForTower:

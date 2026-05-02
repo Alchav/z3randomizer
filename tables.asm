@@ -179,9 +179,9 @@ InvincibleGanon:
 db #$00
 ; #$00 = Off (default)
 ; #$01 = On
-; #$02 = Require All Dungeons
-; #$03 = Require "NumberOfCrystalsRequiredForGanon" Crystals and Aga2
-; #$04 = Require "NumberOfCrystalsRequiredForGanon" Crystals
+; #$02 = Require "GanonRequirementCount" dungeon completions
+; #$03 = Require "GanonRequirementCount" Crystals and Aga2
+; #$04 = Require "GanonRequirementCount" Crystals
 ; #$05 = Require "GoalItemRequirement" Goal Items
 ; #$06 = Require Master sword pedestal to be pulled
 ;--------------------------------------------------------------------------------
@@ -289,9 +289,10 @@ CrystalPendantFlags_2:
 org $30805E ; PC 0x18005E - Number of crystals required to enter GT
 NumberOfCrystalsRequiredForTower:
 db #$07 ; #$07 = 7 Crystals
-org $30805F ; PC 0x18005F - Number of crystals required to kill Ganon
+org $30805F ; PC 0x18005F - Count required to kill Ganon
+GanonRequirementCount:
 NumberOfCrystalsRequiredForGanon:
-db #$07 ; #$07 = 7 Crystals
+db #$07 ; Crystals for modes $03/$04, dungeon completions for mode $02
 ;--------------------------------------------------------------------------------
 org $308060 ; PC 0x180060 - 0x18007E
 ProgrammableItemLogicJump_1:
