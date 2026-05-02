@@ -5,10 +5,6 @@ CheckReceivedItemPropertiesBeforeLoad:
     LDA $7F504C : BEQ +
         LDA $7F504D : TAX
     +
-    TXA
-    PHY
-    JSL.l MaybeLoadCrystalSpritePalette
-    PLY
     LDA $A0 : BEQ .normalCode
     LDA $7EC005 : BNE .lightOff
     .normalCode
@@ -81,34 +77,3 @@ CrystalItemBehaviorCheck:
 
 .bossPrizeCrystal
     JML.l CrystalSpecialBehaviorContinue
-
-; Dynamic/freestanding crystals need SP6 loaded before draw, unlike most items
-; whose palettes are already present in the normal received-item path.
-MaybeLoadCrystalSpritePalette:
-    PHA
-    CMP.b #$20 : BEQ .loadPalette
-    CMP.b #$B9 : BCC .done
-    CMP.b #$C0 : BCS .done
-
-.loadPalette
-    PHX : PHY
-    REP #$20
-    LDA $00 : PHA
-    LDA $02 : PHA
-    SEP #$20
-
-    LDA.b #$04 : STA $0AB1
-    LDA.b #$02 : STA $0AA9
-    JSL.l $1BED72 ; Palette_MiscSpr.justSP6
-    INC $15
-
-    REP #$20
-    PLA : STA $02
-    PLA : STA $00
-    SEP #$20
-    PLY
-    PLX
-
-.done
-    PLA
-RTL

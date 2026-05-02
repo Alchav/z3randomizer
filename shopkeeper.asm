@@ -963,7 +963,6 @@ Shopkeeper_DrawNextItem:
 	PHX : LDA #0 : XBA : TXA : LSR #2 : TAX : LDA.l !SHOP_INVENTORY_DISGUISE, X : PLX : CMP #$0 : BNE ++ 
 		LDA.l !SHOP_INVENTORY, X ; get item palette
 	++
-	JSL.l MaybeLoadCrystalSpritePalette
 	CMP.b #$2E : BNE + : BRA .potion
 	+ CMP.b #$2F : BNE + : BRA .potion
 	+ CMP.b #$30 : BEQ .potion

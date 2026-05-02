@@ -3,10 +3,6 @@
 ;================================================================================
 !PROGRESSIVE_SHIELD = "$7EF416" ; ss-- ----
 !BEE_TRAP_DISGUISE = "$7EF4DA"
-; Dynamic ground-sprite graphics IDs. This table is not the same ID space as
-; received/held-up item graphics.
-!SINGLE_ARROW_SPRITE_GFX = $33
-!KEY_RING_SPRITE_GFX = $41
 ;--------------------------------------------------------------------------------
 ; GetSpriteTile
 ; in:	A - Loot ID
@@ -146,7 +142,7 @@ RTL
 	db $44 ; Safe Master Sword
 	db $3D, $3E, $3F, $40 ; Bomb & Arrow +5/+10
 	db $2C, $00, $00 ; 3x Programmable Item
-	db !SINGLE_ARROW_SPRITE_GFX ; Upgrade-Only Silver Arrows
+	db $33 ; Upgrade-Only Silver Arrows
 	db $24 ; 1 Rupoor
 	db $47 ; Null Item
 	db $48, $48, $48 ; Red, Blue & Green Clocks
@@ -179,10 +175,10 @@ RTL
 	
 	;Cx
 	; Key rings use the dynamic slot where the Silver Arrow graphic is stored.
-	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX ; Key Ring
-	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
-	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
-	db !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX, !KEY_RING_SPRITE_GFX
+	db $41, $41, $41, $41 ; Key Ring
+	db $41, $41, $41, $41
+	db $41, $41, $41, $41
+	db $41, $41, $41, $41
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Unused
 	db $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49, $49 ; Reserved
@@ -318,7 +314,7 @@ RTL
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Free Small Key
 	db $04 ; Bee Trap
 	db $08, $02, $08, $02 ; Fae, Bee, Jar, Apple
-	db $08, $08, $04, $02, $0C, $0C, $0C, $0C, $0C, $0C, $0C ; Unused, Pendants, Crystals
+	db $08, $08, $04, $02, $04, $04, $04, $04, $04, $04, $04 ; Unused, Pendants, Crystals
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Key Ring
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
 	db $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08, $08 ; Unused
@@ -497,9 +493,6 @@ RTS
 ;--------------------------------------------------------------------------------
 DrawDynamicTile:
 		JSR PrepDrawRemoteItemSprite
-		; Crystals can appear as ordinary ground sprites when boss prizes shuffle.
-		JSL.l MaybeLoadCrystalSpritePalette
-
 		JSL.l IsNarrowSprite : BCS .narrow
 
 	.full
@@ -530,9 +523,6 @@ RTL
 ;--------------------------------------------------------------------------------
 DrawDynamicTileNoShadow:
 		JSR PrepDrawRemoteItemSprite
-		; Shadowless dynamic draws need the same crystal palette preload.
-		JSL.l MaybeLoadCrystalSpritePalette
-
 		JSL.l IsNarrowSprite : BCS .narrow
 
 	.full

@@ -900,10 +900,6 @@ LDA.w AddReceivedItemExpanded_item_masks, X
 org $098769 ; 48769 - ancilla_init.asm:1005 (LDA .item_graphics_indices, Y)
 LDA.w AddReceivedItemExpanded_item_graphics_indices, Y
 
-; Let expanded graphics IDs use the variable animated-sprite tile loader.
-org $09878C ; 4878C - ancilla_init.asm:1028 (JSL GetAnimatedSpriteTile.variable)
-JSL.l GetAnimatedSpriteTile_variable
-
 org $09884D ; 4884D - ancilla_init.asm:1137 (LDA $836C, Y)
 LDA.w AddReceivedItemExpanded_y_offsets, Y
 org $09885B ; 4885B - ancilla_init.asm:1139 (LDA .x_offsets, X) - I think the disassembly is wrong here, should have been LDA .x_offsets, Y

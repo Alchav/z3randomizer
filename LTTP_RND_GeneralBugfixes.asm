@@ -307,7 +307,7 @@ org $31A800
 GFX_New_Items:
 ;incbin newitems.gfx
 ;incbin eventitems.gfx ; *EVENT*
-; 2026 item graphics include the key ring art and keep within the original slot.
+; 2026 item graphics include the key ring art
 incbin 2026items.gfx
 warnpc $31B000
 

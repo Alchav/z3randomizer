@@ -462,15 +462,15 @@ DrawPendantCrystalDiagram:
 		REP #$30 ; Set 16-bit accumulator & index registers
 		LDX.w #$0000 ; Paint entire box black & draw empty pendants and crystals
 		-
-	        LDA.w .row0, X : STA $12EA, X
-	        LDA.w .row1, X : STA $132A, X
-	        LDA.w .row2, X : STA $136A, X
-	        LDA.w .row3, X : STA $13AA, X
-	        LDA.w .row4, X : STA $13EA, X
-	        LDA.w .row5, X : STA $142A, X
-	        LDA.w .row6, X : STA $146A, X
-	        LDA.w .row7, X : STA $14AA, X
-	        LDA.w .row8, X : STA $14EA, X
+	        LDA.l .row0, X : STA $12EA, X
+	        LDA.l .row1, X : STA $132A, X
+	        LDA.l .row2, X : STA $136A, X
+	        LDA.l .row3, X : STA $13AA, X
+	        LDA.l .row4, X : STA $13EA, X
+	        LDA.l .row5, X : STA $142A, X
+	        LDA.l .row6, X : STA $146A, X
+	        LDA.l .row7, X : STA $14AA, X
+	        LDA.l .row8, X : STA $14EA, X
 		INX #2 : CPX.w #$0014 : BCC -
 		
 		;pendants
