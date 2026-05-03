@@ -120,7 +120,12 @@ NormalItemSkipSound:
 		RTL
 	+
 	PLA
-	CPY.b #$CE : BEQ .skipSound ; Skip the current-dungeon key ring pickup fanfare
+	CMP.b #$CE : BNE +
+		PHA
+		LDA $0C54, X : CMP.b #$03
+		PLA
+		BEQ .skipSound ; Skip floor-object current-dungeon key ring pickup fanfare
+	+
 
 	CMP.b #$3E : BEQ +
 	CLC

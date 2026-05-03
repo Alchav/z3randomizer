@@ -175,12 +175,13 @@ incsrc init.asm
 
 org $A48000 ; code bank - PUT NEW CODE HERE
 
-; Current-dungeon key rings are inventory-only rewards. They should add the
+; Current-dungeon key rings picked up from floor objects should add the
 ; dungeon's key quantity and update HUD/stats without the normal item fanfare.
 Link_ReceiveItem_HandleCurrentDungeonKeyRing:
 	CPY.b #$CE : BNE .normalReceive
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .normalReceive
 	JSL.l BossPrizeReceiveContextMatches : BCS .normalReceive
+	LDA $02E9 : CMP.b #$03 : BNE .normalReceive
 	JSL.l ReceiveCurrentDungeonKeyRingQuiet
 	JSL.l Player_HaltDashAttackLong
 	CLC
@@ -196,8 +197,8 @@ Link_ReceiveItem_HandleCurrentDungeonKeyRing:
 	.fromTextOrObject
 	JML $0799C8
 
-; Grant the current dungeon's key ring directly because the generic receive-item
-; path only handles one concrete item ID at a time.
+; Grant floor-object current-dungeon key rings directly because they should not
+; use the normal hold-up animation.
 ReceiveCurrentDungeonKeyRingQuiet:
 	PHX : PHY
 		LDA $040C : CMP.b #$FF : BEQ .cleanup
