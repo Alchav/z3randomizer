@@ -94,8 +94,8 @@ CheckEnoughDungeonsForGanon:
 	LDA.l $7EF121 : AND.b #$08 : BEQ + : INX : + ; Misery Mire / Vitreous
 	LDA.l $7EF149 : AND.b #$08 : BEQ + : INX : + ; Turtle Rock / Trinexx
 
-	LDA.l $7EF3C5 : CMP.b #$03 : !BLT + : INX : + ; Agahnim 1
-	LDA.l $7EF2DB : AND.b #$20 : BEQ + : INX : + ; Agahnim 2
+	LDA.l $7EF041 : AND.b #$08 : BEQ + : INX : + ; Agahnim 1
+	LDA.l $7EF01B : AND.b #$08 : BEQ + : INX : + ; Agahnim 2
 
 	TXA
 	PLY : PLX
