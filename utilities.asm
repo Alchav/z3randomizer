@@ -4,12 +4,43 @@
 !PROGRESSIVE_SHIELD = "$7EF416" ; ss-- ----
 !BEE_TRAP_DISGUISE = "$7EF4DA"
 ;--------------------------------------------------------------------------------
+SubstituteBombsWithRupeesWhenCapacityIsZero:
+	PHA
+		LDA $7EF370
+		!ADD.l StartingMaxBombs
+		BEQ .substitute
+	PLA
+RTS
+
+.substitute
+	PLA
+	CMP.b #$27 : BNE + ; Bomb
+		LDA.b #$34 ; Green Rupee
+		RTS
+	+
+	CMP.b #$28 : BNE + ; 3 Bombs
+		LDA.b #$35 ; Blue Rupee
+		RTS
+	+
+	CMP.b #$31 : BNE + ; 10 Bombs
+		LDA.b #$36 ; Red Rupee
+	+
+RTS
+;--------------------------------------------------------------------------------
 ; GetSpriteTile
 ; in:	A - Loot ID
 ; out:	A - Sprite GFX ID
 ;--------------------------------------------------------------------------------
 GetSpriteID:
-	;JSR AttemptItemSubstitution
+	; Skip local capacity substitutions for items that will be sent to another player.
+	PHA
+		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE +
+	PLA
+	JSR SubstituteBombsWithRupeesWhenCapacityIsZero
+	BRA ++
+	+
+	PLA
+	++
 	CMP.b #$16 : BEQ .bottle ; Bottle
 	CMP.b #$2B : BEQ .bottle ; Red Potion w/bottle
 	CMP.b #$2C : BEQ .bottle ; Green Potion w/bottle
@@ -191,7 +222,15 @@ RTL
 ; out:	A - Palette
 ;--------------------------------------------------------------------------------
 GetSpritePalette:
-	;JSR AttemptItemSubstitution
+	; Skip local capacity substitutions for items that will be sent to another player.
+	PHA
+		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE +
+	PLA
+	JSR SubstituteBombsWithRupeesWhenCapacityIsZero
+	BRA ++
+	+
+	PLA
+	++
 	CMP.b #$16 : BEQ .bottle ; Bottle
 	CMP.b #$2B : BEQ .bottle ; Red Potion w/bottle
 	CMP.b #$2C : BEQ .bottle ; Green Potion w/bottle

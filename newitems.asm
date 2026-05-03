@@ -1210,6 +1210,7 @@ IncrementItemCounters:
 RTS
 ;--------------------------------------------------------------------------------
 AttemptItemSubstitution:
+	JSR SubstituteBombsWithRupeesWhenCapacityIsZero
 	PHX : PHA
 	LDX.b #$00
 	-
