@@ -1933,9 +1933,9 @@ org $05FA8E
 Sprite_ShowMessageMinimal:
 JML.l Sprite_ShowMessageMinimal_Alt
 ;--------------------------------------------------------------------------------
-;org $1CFD69
-;Main_ShowTextMessage:
-;JML.l Main_ShowTextMessage_Alt
+org $1CFD69
+Main_ShowTextMessage:
+JML.l Main_ShowTextMessage_Alt
 ;--------------------------------------------------------------------------------
 org $07b0cc ; <- 3b0d0 - Bank 07.asm : 7767 (JSL Main_ShowTextMessage)
 JSL.l Main_ShowTextMessage_Alt

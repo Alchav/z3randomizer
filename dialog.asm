@@ -408,20 +408,50 @@ DialogBombShopGuy:
 	JSL.l Sprite_ShowMessageUnconditional
 RTL
 ;--------------------------------------------------------------------------------
+!HINT_READ_FLAGS = "$7EF4F1"
+;--------------------------------------------------------------------------------
+TrackHintRead:
+	PHX : PHP
+		REP #$30
+		LDA.w $1CF0
+		LDX.w #$0000
+
+		-
+			CMP.l HintReadTable, X : BEQ .match
+			LDA.l HintReadTable, X : CMP.w #$FFFF : BEQ .done
+			INX #4
+			LDA.w $1CF0
+		BRA -
+
+		.match
+			LDA.l HintReadTable+2, X
+			PHA
+				AND.w #$00FF
+				TAX
+			PLA
+			XBA
+			SEP #$20
+			ORA.l !HINT_READ_FLAGS, X
+			STA.l !HINT_READ_FLAGS, X
+	.done
+	PLP : PLX
+RTL
+;--------------------------------------------------------------------------------
 Main_ShowTextMessage_Alt:
 	; Are we in text mode? If so then end the routine.
 	LDA $10 : CMP.b #$0E : BEQ .already_in_text_mode
 Sprite_ShowMessageMinimal_Alt:
 	STZ $11
 
-	PHX : PHY
+	PHX : PHY : PHP
+	SEP #$20
 	LDA.b $00 : PHA
 	LDA.b $01 : PHA
 	LDA.b $02 : PHA
 
 	LDA.b #$1C : STA.b $02
 	REP #$30
-		LDA.w $1CF0 : ASL : TAX
+		LDA.w $1CF0 : ASL : CLC : ADC.w $1CF0 : TAX
 		LDA.l $7f71c0, X
 		STA.b $00
 	SEP #$30
@@ -436,6 +466,8 @@ Sprite_ShowMessageMinimal_Alt:
 		STZ $1CE8
 		BRL .end
 	+
+
+	JSL.l TrackHintRead
 
 	STZ $0223   ; Otherwise set it so we are in text mode.
 	STZ $1CD8   ; Initialize the step in the submodule
@@ -452,7 +484,7 @@ Sprite_ShowMessageMinimal_Alt:
 	PLA : STA.b $02
 	PLA : STA.b $01
 	PLA : STA.b $00
-	PLY : PLX
+	PLP : PLY : PLX
 
 Main_ShowTextMessage_Alt_already_in_text_mode:
 RTL

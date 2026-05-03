@@ -1999,7 +1999,16 @@ BossPrize_Trinexx_Player:
 db #$00
 
 ;--------------------------------------------------------------------------------
-; 0x1863AA - 187FFF (unused)
+org $30E3B0 ; PC 0x1863B0 - 0x1864AF
+; AP in-game hint tracking table.
+; Entry format: dw message_id : db flag_byte_offset, flag_bit_mask
+; $FFFF terminates the table.
+HintReadTable:
+dw $FFFF : db $FF, $FF
+warnpc $30E4B0
+
+;--------------------------------------------------------------------------------
+; 0x1864B0 - 187FFF (unused)
 ;--------------------------------------------------------------------------------
 
 org $30EFFF ; PC 0x186FFF

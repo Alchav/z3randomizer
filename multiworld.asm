@@ -44,6 +44,12 @@ PHX : PHY : PHP
 PLP : PLY : PLX
 endmacro
 
+Multiworld_PrintSentTo:
+{
+	%Print_Text(HUD_SentTo, #$0010, !MULTIWORLD_ITEM_PLAYER_ID)
+RTL
+}
+
 WriteText:
 {
 	PHA : PHX : PHP
@@ -273,12 +279,19 @@ Multiworld_AddReceivedItem_notCrystal:
 {
 	TYA : STA $02E4 : PHX ; things we wrote over
 	
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE +
+	LDA !MULTIWORLD_ITEM_PLAYER_ID : BNE .remote
 		JML.l AddReceivedItem_notCrystal+5
-	+
+
+	.remote
+		JSL.l BossPrizeReceiveContextMatches : BCC .showSentTo
+			PHY : LDY $02D8 : JSL AddInventory : PLY
+			JSL.l Multiworld_PrintSentTo
+			JML.l AddReceivedItem_gfxHandling
+
+	.showSentTo
 		PHY : LDY $02D8 : JSL AddInventory : PLY
 
-		%Print_Text(HUD_SentTo, #$0010, !MULTIWORLD_ITEM_PLAYER_ID)
+		JSL.l Multiworld_PrintSentTo
 		LDA #$33 : STA $012F
 
 		JML.l AddReceivedItem_gfxHandling

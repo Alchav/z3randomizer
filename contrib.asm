@@ -109,6 +109,7 @@ Sprite_ShowSolicitedMessageIfPlayerFacing_Alt:
 
 	.SahasrahlaDialogs
 		REP #$20 : LDA.l MapReveal_Sahasrahla : ORA !MAP_OVERLAY : STA !MAP_OVERLAY : SEP #$20
+		JSL.l TrackHintRead
 		JSL DialogSahasrahla : BRA .SayNothing
 
 	.BombShopGuyDialog

@@ -109,11 +109,6 @@ NormalItemSkipSound:
 		RTL
 	+
 
-	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
-		SEC
-		RTL
-	+
-
 	LDA $0C5E, X ; thing we wrote over
 	PHA
 	; Shuffled boss prizes keep the victory fanfare even when the prize is not
@@ -126,6 +121,13 @@ NormalItemSkipSound:
 		RTL
 	+
 	PLA
+
+	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+		SEC
+		RTL
+	+
+
+	LDA $0C5E, X ; thing we wrote over
 	CMP.b #$CE : BNE +
 		PHA
 		LDA $0C54, X : CMP.b #$03

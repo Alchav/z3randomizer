@@ -508,9 +508,11 @@ AddReceivedItemExpanded:
 {
 	PHA : PHX
 		; Boss prizes may be remote items, so set the recipient before normal
-		; local/remote inventory handling runs.
+		; local/remote inventory handling runs. They still need the normal
+		; receive-item object path for the prize fanfare and dungeon exit.
 		JSL.l BossPrizeApplyItemPlayer
-		LDA RemoteItems : BEQ + : LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
+		JSL.l BossPrizeReceiveContextMatches : BCS .normalReceive
+		LDA RemoteItems : BEQ .normalReceive : LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ .normalReceive
 			LDA $02E9 : BEQ ++ : CMP #$03 : BNE +++ : ++
 				; fromTextOrObject
 				LDA $0345 : BEQ ++ : LDA.b #$04 : ++ : STA $5D ; Restore Link to his swimming state
@@ -520,7 +522,8 @@ AddReceivedItemExpanded:
 			STZ $02D8 : STZ $02D9 : STZ $02E9
 			PHY : LDY.b #$00 : JSL AddInventory : PLY
 			PLX : PLA : RTL
-		+
+
+	.normalReceive
 		
 		JSL.l PreItemGet
 
