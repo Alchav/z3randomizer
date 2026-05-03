@@ -299,11 +299,13 @@ BossPrizeObjectContextMatches:
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
-; Apply the configured multiworld recipient before the item is granted.
+; Mark the location check and apply the configured multiworld recipient before
+; the item is granted.
 BossPrizeApplyItemPlayer:
 	JSL.l BossPrizeReceiveContextMatches : BCC .done
+	JSL.l MarkBossPrizeDungeonCompletion
 	JSL.l BossPrizeGetPlayer : STA !MULTIWORLD_ITEM_PLAYER_ID
-.done
+	.done
 RTL
 ;--------------------------------------------------------------------------------
 ; Non-pendant shuffled prizes still need the victory fanfare before warping out.
@@ -330,11 +332,10 @@ BossPrizePendantWaitCheck:
 .dontWaitForMusic
 	JML.l PendantFanfareDone
 ;--------------------------------------------------------------------------------
-; Finish a shuffled boss prize by marking dungeon completion, showing deferred
-; text if needed, then routing to the dungeon-exit path.
+; Finish a shuffled boss prize by showing deferred text if needed, then routing
+; to the dungeon-exit path.
 HandleBossPrizeObjectFinished:
 	JSL.l BossPrizeObjectContextMatches : BCC .normalObjectFinished
-	JSL.l MarkBossPrizeDungeonCompletion
 	JSL.l ClearBossPrizeContext
 
 	LDA $7F509F : BEQ +
