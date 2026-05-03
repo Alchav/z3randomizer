@@ -942,7 +942,7 @@ org $08C70F ; 4470F - ancilla_receive_item.asm : 582 - (LDA.b #$00 : STA ($92), 
 JSL.l LoadNarrowObject
 
 ; Boss-prize narrow items need the shadow position adjusted after the item body.
-org $08CDF3 ; 44DF3 - ancilla_milestone_item.asm:239 (REP #$20 : LDA $06 : ADD.w #$000C : STA $00)
+org $08CBF3 ; 44BF3 - ancilla_milestone_item.asm:239 (REP #$20 : LDA $06 : ADD.w #$000C : STA $00)
 JSL.l BossPrizeMilestoneShadowPrep
 NOP #6
 
