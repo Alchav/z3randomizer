@@ -1,6 +1,8 @@
 ;================================================================================
 ; Randomize Heart Pieces
 ;--------------------------------------------------------------------------------
+!BOSS_HEART_FANFARE = "$7F5072"
+
 HeartPieceGet:
 	PHX : PHY
 	LDY $0E80, X ; load item value into Y register
@@ -30,6 +32,7 @@ HeartPieceGet:
 	BRL .done ; finished
 
 	.unfinished_heart
+	LDA.b #$00 : STA !BOSS_HEART_FANFARE
 	SEC ; return true
 	.done
 	
@@ -47,6 +50,8 @@ HeartContainerGet:
 		JSL.l LoadHeartContainerRoomValue : TAY
 	+
 
+	LDA.b #$01 : STA !BOSS_HEART_FANFARE
+	LDA.b #$2E : JSL Sound_SetSfx3PanLong
 	BRA HeartPieceGet_skipLoad
 ;--------------------------------------------------------------------------------
 !REDRAW = "$7F5000"
@@ -94,15 +99,16 @@ DrawHeartContainerGFX:
 	BRA DrawHeartPieceGFX_skipLoad
 ;--------------------------------------------------------------------------------
 HeartContainerSound:
-	CPY.b #$3E : BNE +
-		LDA.b #$2E
-		SEC
-		RTL
-	+
 	CLC
 RTL
 ;--------------------------------------------------------------------------------
 NormalItemSkipSound:
+	LDA !BOSS_HEART_FANFARE : BEQ +
+		LDA.b #$00 : STA !BOSS_HEART_FANFARE
+		SEC
+		RTL
+	+
+
 	LDA !MULTIWORLD_ITEM_PLAYER_ID : BEQ +
 		SEC
 		RTL
@@ -127,10 +133,9 @@ NormalItemSkipSound:
 		BEQ .skipSound ; Skip floor-object current-dungeon key ring pickup fanfare
 	+
 
-	CMP.b #$3E : BEQ +
 	CLC
 	RTL
-	+
+
 .skipSound
 	SEC
 RTL

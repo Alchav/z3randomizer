@@ -1555,7 +1555,8 @@ dw #9999 ; Rupee Limit
 ; $7F504F - $7F506F - Shop Block
 ; $7F5070 - Reserved for OneMind
 ; $7F5071 - Reserved for OneMind
-; $7F5072 - $7F507D - Unused
+; $7F5072 - Boss Heart Fanfare / Normal Sound Suppress Flag
+; $7F5073 - $7F507D - Unused
 ; $7F507E - Clock Status
 ; $7F507F - Always Zero
 ; $7F5080 - $7F5083 - Clock Hours
