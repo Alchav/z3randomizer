@@ -133,7 +133,10 @@ SpriteKeyDrawGFX:
     cmp #$24 : bne +
     	lda $a0 : cmp #$80 : bne - : lda #$24
     + jsl DrawDynamicTile ; see DrawHeartPieceGFX if problems
-    cmp #$03 : bne +
+    cmp #$03 : beq .narrow
+        pha : lda $0e60, x : and.b #$DF : sta $0E60, x : pla
+        bra +
+    .narrow
         pha : lda $0e60, x : ora.b #$20 : sta $0E60, x : pla
     +
     jsl.l Sprite_DrawShadowLong
