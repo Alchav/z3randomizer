@@ -369,7 +369,15 @@ RTL
 IsNarrowSprite:
 	PHA : PHX
 	PHB : PHK : PLB
-	;JSR AttemptItemSubstitution
+	; Skip local capacity substitutions for items that will be sent to another player.
+	PHA
+		LDA !MULTIWORLD_SPRITEITEM_PLAYER_ID : BNE +
+	PLA
+	JSR SubstituteBombsWithRupeesWhenCapacityIsZero
+	BRA ++
+	+
+	PLA
+	++
 	;--------
 	CMP.b #$16 : BEQ .bottle ; Bottle
 	CMP.b #$2B : BEQ .bottle ; Red Potion w/bottle

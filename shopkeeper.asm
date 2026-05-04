@@ -355,10 +355,17 @@ SetupShopItem:
 			JSL GetRandomInt : AND #$3F : STA !BEE_TRAP_DISGUISE
 			BNE ++ : LDA #$49 : ++ : CMP #$26 : BNE ++ : LDA #$6A : ++ ; if 0 (fighter's sword + shield), set to just sword, if filled container (bugged palette), switch to triforce piece
 			STA.l !SHOP_INVENTORY_DISGUISE, X : PLX
-		+ : TAY
+		+
+		PHA : PHX
+			LDA #0 : XBA : TYA : LSR #2 : TAX
+			LDA.l !SHOP_INVENTORY_PLAYER, X : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+		PLX : PLA
+		TAY
 		REP #$20 ; set 16-bit accumulator
 		LDA 1,s : TAX : LDA.l .tile_offsets, X : TAX
 		JSR LoadTile
+		SEP #$20 ; set 8-bit accumulator
+		LDA #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	PLY : PLX
 	RTS
 .tile_offsets
@@ -959,6 +966,11 @@ Shopkeeper_DrawNextItem:
 	++
 	SEP #$20 ; set 8-bit accumulator
 	PLY
+
+	PHX
+		LDA #0 : XBA : TXA : LSR #2 : TAX
+		LDA.l !SHOP_INVENTORY_PLAYER, X : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
+	PLX
 	
 	PHX : LDA #0 : XBA : TXA : LSR #2 : TAX : LDA.l !SHOP_INVENTORY_DISGUISE, X : PLX : CMP #$0 : BNE ++ 
 		LDA.l !SHOP_INVENTORY, X ; get item palette
@@ -1037,6 +1049,7 @@ Shopkeeper_DrawNextItem:
 	+
 	
 	.next
+	LDA.b #$00 : STA !MULTIWORLD_SPRITEITEM_PLAYER_ID
 	INY
 	INX #4
 RTS
