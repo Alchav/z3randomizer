@@ -12,7 +12,9 @@ FloodGateReset:
 	+
 FloodGateResetInner:
 	LDA.l Bugfix_SwampWaterLevel : BEQ .done
-	    LDA $279004 : BEQ .check_room_53 ; Only do the check for room 55 if on door rando
+		LDA.l ShuffleKeyDrops : BNE .check_room_55
+	    LDA $279004 : BEQ .check_room_53 ; Only do the check for room 55 if on door rando or key drop shuffle
+	.check_room_55
 		LDA $7EF06F : AND.b #$04 : BEQ .drain_room_55 ; Check if key in room 55 has been collected. 
 		LDA $7EF356 : AND.b #$01 : BNE .check_room_53 ; Check for flippers. This can otherwise softlock doors if flooded without flippers and no way to reset.
 	.drain_room_55
