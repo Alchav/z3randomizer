@@ -1937,13 +1937,13 @@ JML.l Sprite_ShowMessageMinimal_Alt
 ;--------------------------------------------------------------------------------
 org $1CFD69
 Main_ShowTextMessage:
-JML.l Main_ShowTextMessage_Alt
+JML.l Main_ShowTextMessage_TrackHintRead
 ;--------------------------------------------------------------------------------
 org $07b0cc ; <- 3b0d0 - Bank 07.asm : 7767 (JSL Main_ShowTextMessage)
-JSL.l Main_ShowTextMessage_Alt
+JSL.l Main_ShowTextMessage_TrackHintRead
 ;--------------------------------------------------------------------------------
 org $08c5fe ; <- 445FE - ancilla_receive_item.asm : 408 (JSL Main_ShowTextMessage)
-JSL.l Main_ShowTextMessage_Alt
+JSL.l Main_ShowTextMessage_TrackHintRead
 ;--------------------------------------------------------------------------------
 org $05E21F ; <- 2E21F - Bank05.asm : 2691 (STZ $0223)
 JSL.l Sprite_ShowMessageMinimal_Alt

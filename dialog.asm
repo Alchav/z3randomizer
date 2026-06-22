@@ -437,6 +437,27 @@ TrackHintRead:
 	PLP : PLX
 RTL
 ;--------------------------------------------------------------------------------
+Main_ShowTextMessage_TrackHintRead:
+	; Are we in text mode? If so then end the routine.
+	LDA $10 : CMP.b #$0E : BEQ .already_in_text_mode
+
+	JSL.l TrackHintRead
+
+	STZ $0223   ; Otherwise set it so we are in text mode.
+	STZ $1CD8   ; Initialize the step in the submodule
+
+	; Go to text display mode (as opposed to maps, etc)
+	LDA.b #$02 : STA $11
+
+	; Store the current module in the temporary location.
+	LDA $10 : STA $010C
+
+	; Switch the main module ($10) to text mode.
+	LDA.b #$0E : STA $10
+
+.already_in_text_mode
+RTL
+;--------------------------------------------------------------------------------
 Main_ShowTextMessage_Alt:
 	; Are we in text mode? If so then end the routine.
 	LDA $10 : CMP.b #$0E : BEQ .already_in_text_mode
