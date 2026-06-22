@@ -381,33 +381,23 @@ RTL
 ;--------------------------------------------------------------------------------
 ; Record shuffled boss-prize completion separately from vanilla pendant/crystal bits.
 MarkBossPrizeDungeonCompletion:
-	LDA $040C
-	CMP #$FF : BEQ .done
-		LSR : AND #$0F : CMP #$08 : !BGE +
-			JSR BossPrizeValueShift
-			ORA $7EF46B : STA $7EF46B
-			BRA .done
-		+
-			!SUB #$08
-			JSR BossPrizeValueShift
-			BIT.b #$C0 : BEQ ++ : LDA.b #$C0 : ++ ; Make Hyrule Castle / Sewers Count for Both
-			ORA $7EF46C : STA $7EF46C
+	JSR BossPrizeRoomCompletionMask : BCC .done
+	CPX.b #$01 : BEQ .highByte
+		ORA $7EF46B : STA $7EF46B
+		BRA .done
+	.highByte
+		ORA $7EF46C : STA $7EF46C
 .done
 RTL
 
-; Check the shuffled boss-prize completion bit for the current dungeon.
+; Check the shuffled boss-prize completion bit for the current boss-prize room.
 BossPrizeDungeonCompletionMatches:
-	LDA $040C
-	CMP #$FF : BEQ .mismatch
-		LSR : AND #$0F : CMP #$08 : !BGE +
-			JSR BossPrizeValueShift
-			AND.l $7EF46B : BNE .match
-			BRA .mismatch
-		+
-			!SUB #$08
-			JSR BossPrizeValueShift
-			BIT.b #$C0 : BEQ ++ : LDA.b #$C0 : ++
-			AND.l $7EF46C : BNE .match
+	JSR BossPrizeRoomCompletionMask : BCC .mismatch
+	CPX.b #$01 : BEQ .highByte
+		AND.l $7EF46B : BNE .match
+		BRA .mismatch
+	.highByte
+		AND.l $7EF46C : BNE .match
 
 .mismatch
 	CLC
@@ -415,6 +405,67 @@ RTL
 
 .match
 	SEC
+RTL
+
+; Map the current boss room to the boss-prize completion byte and mask used by
+; the client. Carry set on match. X=0 means $7EF46B; X=1 means $7EF46C.
+BossPrizeRoomCompletionMask:
+	REP #$20 ; set 16-bit accumulator
+	LDA $A0
+	CMP.w #200 : BNE +
+		SEP #$20 : LDA.b #$04 : LDX.b #$00 : SEC : RTS
+	+ CMP.w #51 : BNE +
+		SEP #$20 : LDA.b #$08 : LDX.b #$00 : SEC : RTS
+	+ CMP.w #7 : BNE +
+		SEP #$20 : LDA.b #$04 : LDX.b #$01 : SEC : RTS
+	+ CMP.w #90 : BNE +
+		SEP #$20 : LDA.b #$40 : LDX.b #$00 : SEC : RTS
+	+ CMP.w #6 : BNE +
+		SEP #$20 : LDA.b #$20 : LDX.b #$00 : SEC : RTS
+	+ CMP.w #41 : BNE +
+		SEP #$20 : LDA.b #$01 : LDX.b #$01 : SEC : RTS
+	+ CMP.w #172 : BNE +
+		SEP #$20 : LDA.b #$08 : LDX.b #$01 : SEC : RTS
+	+ CMP.w #222 : BNE +
+		SEP #$20 : LDA.b #$02 : LDX.b #$01 : SEC : RTS
+	+ CMP.w #144 : BNE +
+		SEP #$20 : LDA.b #$80 : LDX.b #$00 : SEC : RTS
+	+ CMP.w #164 : BNE +
+		SEP #$20 : LDA.b #$10 : LDX.b #$01 : SEC : RTS
+	+
+	SEP #$20
+	CLC
+RTS
+
+; Tag routine 0x16 "clear level to open doors". In shuffled-prize mode,
+; use the boss-prize completion bits instead of vanilla pendant/crystal bits.
+BossPrizeClearLevelToOpenDoors:
+	LDA BossPrizeShuffle : BEQ .vanilla
+	JSL.l CheckIfBossRoom : BCC .vanilla
+	JSL.l BossPrizeDungeonCompletionMatches : BCS .openDoors
+	BRA .dontHaveGoalItem
+
+.vanilla
+	LDA $040C : LSR A : TAX
+	LDA.l CrystalPendantFlags_2, X : BNE .inDarkWorld
+		LDA $7EF374 : AND.l CrystalPendantFlags, X : BNE .openDoors
+		BRA .dontHaveGoalItem
+
+.inDarkWorld
+	LDA $7EF37A : AND.l CrystalPendantFlags, X : BEQ .dontHaveGoalItem
+
+.openDoors
+	REP #$30
+	STZ $0468
+	STZ $068E
+	STZ $0690
+	SEP #$30
+	LDA.b #$05 : STA $11
+	LDX $0E
+	STZ $AE, X
+
+.dontHaveGoalItem
+	SEP #$30
 RTL
 
 ; Convert a dungeon index into a single-bit mask for completion storage.

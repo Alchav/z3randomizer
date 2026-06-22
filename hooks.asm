@@ -1765,8 +1765,10 @@ JSL.l FlipLWDWFlag
 NOP #2
 ;================================================================================
 ;Clear level to open doors
-org $01C50D ; 0xC50D - Bank01.asm:10032 - (LDA $7EF3CA : BNE .inDarkWorld)
-LDA CrystalPendantFlags_2, X
+org $01C508 ; 0xC508 - Bank01.asm:10027 - tag routine 0x16
+JSL.l BossPrizeClearLevelToOpenDoors
+RTS
+NOP #52
 ;================================================================================
 ;Kill enemy to clear level
 org $01C715 ; <- C715 - Bank01.asm:10358 - (LDA $7EF3CA : BNE .inDarkWorld)
