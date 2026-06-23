@@ -799,9 +799,6 @@ org $06B49D ; <- 3349D - sprite_smithy_bros.asm : 485 (.tempered_sword_or_better
 Smithy_AlreadyGotSword:
 org $06B561 ; <- 33561 - sprite_smithy_bros.asm : 640 (JSL Link_ReceiveItem)
 ;--------------------------------------------------------------------------------
-org $06ED55 ; <- 36D55 - Bank06.asm : 4817
-JSL.l LoadSwordForDamage ; moth gold sword fix
-;--------------------------------------------------------------------------------
 org $08C5F7 ; <- 445F7 - ancilla_receive_item.asm : 400 (LDA.b #$09 : STA $012D)
 NOP #5 ; remove spooky telepathy sound
 ;--------------------------------------------------------------------------------
