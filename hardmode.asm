@@ -82,7 +82,22 @@ GetItemDamageValue:
 	CPX.b #$3d : BEQ .hookshot
 
 	.normal
-	lda $0db8f1,x ;what we wrote over
+	LDA $0DB8F1, X ; what we wrote over
+	CMP.b #$FB : !BLT .done
+	CMP.b #$FD : BEQ .done ; incinerate should still apply
+
+	; The caller has the sprite slot saved under the JSL return address.
+	TAY
+	LDA $04,s : TAX
+	LDA $0DD0, X : CMP.b #$0B : BNE .restoreDamage
+	STZ $47
+	STZ $02E3
+	LDA.b #$00
+RTL
+
+	.restoreDamage
+	TYA
+	.done
 RTL
 	.boomerang
 		LDA.l StunItemAction : AND #$01 : BNE .normal
