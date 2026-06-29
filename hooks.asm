@@ -799,9 +799,6 @@ org $06B49D ; <- 3349D - sprite_smithy_bros.asm : 485 (.tempered_sword_or_better
 Smithy_AlreadyGotSword:
 org $06B561 ; <- 33561 - sprite_smithy_bros.asm : 640 (JSL Link_ReceiveItem)
 ;--------------------------------------------------------------------------------
-org $06ED55 ; <- 36D55 - Bank06.asm : 4817
-JSL.l LoadSwordForDamage ; moth gold sword fix
-;--------------------------------------------------------------------------------
 org $08C5F7 ; <- 445F7 - ancilla_receive_item.asm : 400 (LDA.b #$09 : STA $012D)
 NOP #5 ; remove spooky telepathy sound
 ;--------------------------------------------------------------------------------
@@ -1765,8 +1762,10 @@ JSL.l FlipLWDWFlag
 NOP #2
 ;================================================================================
 ;Clear level to open doors
-org $01C50D ; 0xC50D - Bank01.asm:10032 - (LDA $7EF3CA : BNE .inDarkWorld)
-LDA CrystalPendantFlags_2, X
+org $01C508 ; 0xC508 - Bank01.asm:10027 - tag routine 0x16
+JSL.l BossPrizeClearLevelToOpenDoors
+RTS
+NOP #52
 ;================================================================================
 ;Kill enemy to clear level
 org $01C715 ; <- C715 - Bank01.asm:10358 - (LDA $7EF3CA : BNE .inDarkWorld)
@@ -1935,13 +1934,13 @@ JML.l Sprite_ShowMessageMinimal_Alt
 ;--------------------------------------------------------------------------------
 org $1CFD69
 Main_ShowTextMessage:
-JML.l Main_ShowTextMessage_Alt
+JML.l Main_ShowTextMessage_TrackHintRead
 ;--------------------------------------------------------------------------------
 org $07b0cc ; <- 3b0d0 - Bank 07.asm : 7767 (JSL Main_ShowTextMessage)
-JSL.l Main_ShowTextMessage_Alt
+JSL.l Main_ShowTextMessage_TrackHintRead
 ;--------------------------------------------------------------------------------
 org $08c5fe ; <- 445FE - ancilla_receive_item.asm : 408 (JSL Main_ShowTextMessage)
-JSL.l Main_ShowTextMessage_Alt
+JSL.l Main_ShowTextMessage_TrackHintRead
 ;--------------------------------------------------------------------------------
 org $05E21F ; <- 2E21F - Bank05.asm : 2691 (STZ $0223)
 JSL.l Sprite_ShowMessageMinimal_Alt
