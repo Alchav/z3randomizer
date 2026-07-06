@@ -854,7 +854,7 @@ AddReceivedItemExpanded:
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Big Key
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Free Small Key
 	db  1 ; Bee Trap
-	db  4, 4, 4, 4, 4, 4, 2, 1, 2, 2, 2, 2, 2, 2, 2 ; Unused, Pendants, Crystals
+	db  4, 4, 4, 4, 4, 4, 2, 1, 2, 2, 2, 2, 1, 1, 2 ; Unused, Pendants, Crystals
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
 	db  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 ; Unused
