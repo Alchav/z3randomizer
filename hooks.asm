@@ -75,6 +75,31 @@ JSL.l OnDungeonExit : NOP #2
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
+; Two-torch puzzle rooms
+;--------------------------------------------------------------------------------
+; Vanilla torch room tags require 4 lit torches. Puzzle shuffle can place torch
+; tags in rooms 0x0B and 0x74, which only have 2 usable torches.
+org $01C642 ; <- Bank01.asm, tag 0x33 "light torches to open" (LDA $00 : CMP #$0004)
+JSL.l ComparePuzzleTorchRequirement
+NOP
+
+org $01C8C7 ; <- Bank01.asm, tag 0x3E "light torches to get chest" (LDA $00 : CMP #$0004)
+JSL.l ComparePuzzleTorchRequirement
+NOP
+
+org $36F000
+ComparePuzzleTorchRequirement:
+    LDA $A0 : CMP.w #$000B : BEQ .twoTorches
+    CMP.w #$0074 : BEQ .twoTorches
+    LDA $00 : CMP.w #$0004
+    RTL
+
+.twoTorches
+    LDA $00 : CMP.w #$0002
+    RTL
+;--------------------------------------------------------------------------------
+
+;================================================================================
 ; Quit Hook (for both types of save and quit)
 ;--------------------------------------------------------------------------------
 org $09F60B ; <- 4F60B - module_death.asm : 530 (LDA.b #$10 : STA $1C)
