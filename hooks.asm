@@ -100,6 +100,26 @@ ComparePuzzleTorchRequirement:
 ;--------------------------------------------------------------------------------
 
 ;================================================================================
+; Floodgate HDMA scroll fix
+;--------------------------------------------------------------------------------
+org $00F664 ; <- Bank00.asm, Hdma_ConfigureWaterTable (LDA $0680 : SUB $E2)
+JSL.l ClampFloodgateWatergateHdmaScroll
+NOP #2
+
+org $00F742 ; <- Bank00.asm, Hdma_ConfigureWaterTableForWaterfall (LDA $0680 : SUB $E2)
+JSL.l ClampFloodgateWatergateHdmaScroll
+NOP #2
+
+org $00F754 ; <- Bank00.asm, Hdma_ConfigureWaterTableForWaterfall first line-bounds packing
+JSL.l BuildFloodgateWatergateLineBounds
+NOP #22
+
+org $00F78D ; <- Bank00.asm, Hdma_ConfigureWaterTableForWaterfall second line-bounds packing
+JSL.l BuildFloodgateWatergateLineBounds
+NOP #23
+;--------------------------------------------------------------------------------
+
+;================================================================================
 ; Quit Hook (for both types of save and quit)
 ;--------------------------------------------------------------------------------
 org $09F60B ; <- 4F60B - module_death.asm : 530 (LDA.b #$10 : STA $1C)

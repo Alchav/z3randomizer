@@ -116,7 +116,7 @@ incsrc itemdowngrade.asm
 incsrc bugfixes.asm
 incsrc darkworldspawn.asm
 incsrc lampmantlecone.asm
-incsrc floodgatesoftlock.asm
+incsrc floodgates.asm
 incsrc heartpieces.asm
 incsrc npcitems.asm
 incsrc utilities.asm

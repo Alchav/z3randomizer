@@ -1,5 +1,5 @@
 ;================================================================================
-; Floodgate Softlock Fix
+; Floodgate Fixes
 ;--------------------------------------------------------------------------------
 FloodGateAndMasterSwordFollowerReset:
 	JSL.l MasterSwordFollowerClear
@@ -24,5 +24,52 @@ FloodGateResetInner:
 		; no need to check for flippers on the inner room, as you can't get to the west door no matter what, without flippers.
 		LDA $7EF06A : AND.b #$7F : STA $7EF06A ; clear water room 53 - inner room with the easy key flood softlock
 	.done
+RTL
+;================================================================================
+
+; Puzzle randomization can place the good Floodgate lever on the left side of the
+; room. Pulling it from there leaves the camera farther west than vanilla expects,
+; which makes the watergate HDMA window start partly off-screen.
+;
+; $E2 is the BG2 camera scroll mirror. The watergate object position in $0680
+; still needs to be converted to screen space, but for this one room we clamp
+; the effective camera position to the vanilla-ish right-lever view and clip the
+; packed left/right HDMA bounds so the later gate opening intervals do not wrap
+; and make the water disappear.
+
+ClampFloodgateWatergateHdmaScroll:
+	LDA $A0 : CMP.w #$010B : BNE .normal ; Dam/Floodgate room 267.
+		LDA $E2 : CMP.w #$1660 : BCS .normal
+			LDA $0680 : SEC : SBC.w #$1660
+			RTL
+
+	.normal
+	LDA $0680 : SEC : SBC $E2
+RTL
+;================================================================================
+
+BuildFloodgateWatergateLineBounds:
+	STA $0C
+	LDA $A0 : CMP.w #$010B : BEQ .clipped ; Dam/Floodgate room 267.
+
+	.normal
+	LDA $0C : CLC : ADC $0670 : STA $02
+	LDA $0670 : SEC : SBC $0C : AND.w #$00FF : STA $00
+	LDA $02 : AND.w #$00FF : XBA : ORA $00 : STA $0C
+	RTL
+
+	.clipped
+	LDA $0670 : SEC : SBC $0C : BPL .leftInBounds
+		LDA.w #$0000
+
+	.leftInBounds
+	AND.w #$00FF : STA $00
+
+	LDA $0670 : CLC : ADC $0C
+	CMP.w #$0100 : BCC .rightInBounds
+		LDA.w #$00FF
+
+	.rightInBounds
+	AND.w #$00FF : XBA : ORA $00 : STA $0C
 RTL
 ;================================================================================
