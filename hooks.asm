@@ -2102,6 +2102,11 @@ org $08C45F ; <- 4445F - ancilla_recieve_item.asm:157 (STZ $02E9 : LDA $0C5E, X)
 Ancilla_ReceiveItem_optimus:
 JML.l PostItemAnimation : NOP #2
 
+org $08C46F ; <- 4446F - ancilla_receive_item.asm:164 (PHX : LDY.b #$26 : JSL Link_ReceiveItem ...)
+JSL.l BossPrizeHeartPieceCompletionBranch
+RTS
+NOP #10
+
 ; Split receive-item dispatch so boss-prize text/object states can be handled.
 org $08C3D0 ; <- 443D0 - ancilla_receive_item.asm:62 (LDA $0C54, X)
 JML.l BossPrizeReceiveDispatch

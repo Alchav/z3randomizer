@@ -293,10 +293,49 @@ BossPrizeObjectContextMatches:
 	JSL.l BossPrizeContextMatchesRoom : BCC .mismatch
 	JSL.l BossPrizeContextMatchesSlot : BCC .mismatch
 	SEC
-	RTL
+RTL
 
 .mismatch
 	CLC
+RTL
+;--------------------------------------------------------------------------------
+; Every fourth received Piece of Heart obtained is converted into a second
+; receive-item animation, then the original ancilla is cleared without entering
+; the ordinary object-finished path. If that original item was a shuffled boss
+; prize, move the boss-prize context to the new completion-heart ancilla so the
+; existing finish hook can warp after the full-heart animation ends.
+BossPrizeRetargetHeartPieceCompletion:
+	JSL.l BossPrizeObjectContextMatches : BCC .done
+	PHX
+	LDX.b #$09
+
+.nextAncilla
+	LDA $0C4A, X : CMP.b #$22 : BNE .next
+	LDA $0C5E, X : CMP.b #$26 : BNE .next
+	LDA.b #$03 : STA $0C54, X
+	TXA : STA !BOSS_PRIZE_SLOT
+	BRA .found
+
+.next
+	DEX : BPL .nextAncilla
+
+.found
+	PLX
+
+.done
+RTL
+;--------------------------------------------------------------------------------
+; Replacement for the vanilla Piece of Heart completion branch in receive-item
+; object cleanup. This preserves the normal completion-heart animation and adds
+; the boss-prize retargeting above before clearing the original receive object.
+BossPrizeHeartPieceCompletionBranch:
+	PHX
+	LDY.b #$26
+	JSL.l Link_ReceiveItem
+	PLX
+	JSL.l BossPrizeRetargetHeartPieceCompletion
+	STZ $0C4A, X
+	STZ $0FC1
 RTL
 ;--------------------------------------------------------------------------------
 ; Mark the location check and apply the configured multiworld recipient before
