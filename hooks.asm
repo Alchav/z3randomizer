@@ -685,6 +685,9 @@ NOP #2
 ;================================================================================
 ; Wallmaster camera fix
 ;--------------------------------------------------------------------------------
+org $1EAF10 ; <- F2F10 sprite_wallmaster.asm : 68 (JSL Sprite_CheckDamageFromPlayerLong)
+JSL.l WallmastersStayDeadCheckDamage
+
 org $1EAF77 ; <- F2F77 sprite_wallmaster.asm : 141 (LDA.b #$2A : JSL Sound_SetSfx3PanLong)
 JSL.l WallmasterCameraFix
 

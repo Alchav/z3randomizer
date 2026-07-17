@@ -28,3 +28,29 @@ RTL
 RTL
 ;--------------------------------------------------------------------------------
 
+;--------------------------------------------------------------------------------
+; WallmastersStayDeadCheckDamage:
+; optionally clear the active Wallmaster spawner when one of its spawned
+; Wallmasters is killed, preventing further spawns in this room visit.
+;--------------------------------------------------------------------------------
+WallmastersStayDeadCheckDamage:
+	JSL.l $06F2B0 ; Sprite_CheckDamageFromPlayerLong, what we wrote over
+	LDA.l WallmastersStayDead : BEQ .return
+	LDA $0DD0, X : CMP.b #$09 : BNE .clear_spawners
+	LDA $0E20, X : CMP.b #$90 : BNE .clear_spawners ; transformed into another sprite
+	LDA $0CE2, X : BEQ .return
+	CMP.b #$FD : BEQ .clear_spawners ; incinerated
+	CMP.b #$FB : BCS .return ; stunned or frozen, not killed
+	CMP $0E50, X : BCC .return ; pending damage is not lethal
+.clear_spawners
+	PHX
+	LDX.b #$07
+.next_spawner
+	LDA $0B00, X : CMP.b #$09 : BNE .skip_spawner
+	STZ $0B00, X
+.skip_spawner
+	DEX : BPL .next_spawner
+	PLX
+.return
+	RTL
+;--------------------------------------------------------------------------------

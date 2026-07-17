@@ -946,7 +946,9 @@ org $30818E ; PC 0x18018E
 BossPrizeShuffle:
 db #$00 ; #$00 = vanilla boss prizes (default) - #$01 = shuffled boss prizes use ordinary item IDs and warp after collection
 ;================================================================================
-; 0x18018F (unused)
+org $30818F ; PC 0x18018F
+WallmastersStayDead:
+db #$00 ; #$00 = vanilla behavior (default) - #$01 = killing a Wallmaster stops further Wallmaster spawns
 ;================================================================================
 org $308190 ; PC 0x180190 - 0x180192
 TimerStyle:
