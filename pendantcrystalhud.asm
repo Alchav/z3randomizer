@@ -291,75 +291,114 @@ DrawHUDDungeonItems:
 	; write black
 	LDX.w #$0000 ; Paint entire box black & draw empty pendants and crystals
 	-
-		LDA #$24F5 : STA $1686, X : STA $16C6, X
+		LDA #$24F5 : STA $1686, X : STA $16C6, X : STA $1706, X
 	INX #2 : CPX.w #$0020 : BCC -
+
+	; Dungeon clears used by the Dungeons goal. Hyrule Castle/Sewers has no boss flag.
+	LDA.w #$2828 : STA $1684 ; dungeon clear icon
+	LDA $7EF041 : AND.w #$0008 : BEQ + ; Agahnim 1
+		LDA.w #$2826 : STA $1688
+	+
+	LDA $7EF191 : AND.w #$0008 : BEQ + ; Eastern Palace / Armos Knights
+		LDA.w #$2826 : STA $168C
+	+
+	LDA $7EF067 : AND.w #$0008 : BEQ + ; Desert Palace / Lanmolas
+		LDA.w #$2826 : STA $168E
+	+
+	LDA $7EF00F : AND.w #$0008 : BEQ + ; Tower of Hera / Moldorm
+		LDA.w #$2826 : STA $1690
+	+
+	LDA $7EF0B5 : AND.w #$0008 : BEQ + ; Palace of Darkness / Helmasaur King
+		LDA.w #$2826 : STA $1694
+	+
+	LDA $7EF00D : AND.w #$0008 : BEQ + ; Swamp Palace / Arrghus
+		LDA.w #$2826 : STA $1696
+	+
+	LDA $7EF053 : AND.w #$0008 : BEQ + ; Skull Woods / Mothula
+		LDA.w #$2826 : STA $1698
+	+
+	LDA $7EF159 : AND.w #$0008 : BEQ + ; Thieves' Town / Blind
+		LDA.w #$2826 : STA $169A
+	+
+	LDA $7EF1BD : AND.w #$0008 : BEQ + ; Ice Palace / Kholdstare
+		LDA.w #$2826 : STA $169C
+	+
+	LDA $7EF121 : AND.w #$0008 : BEQ + ; Misery Mire / Vitreous
+		LDA.w #$2826 : STA $169E
+	+
+	LDA $7EF149 : AND.w #$0008 : BEQ + ; Turtle Rock / Trinexx
+		LDA.w #$2826 : STA $16A0
+	+
+	LDA $7EF01B : AND.w #$0008 : BEQ + ; Agahnim 2
+		LDA.w #$2826 : STA $16A4
+	+
 
 	LDA !HUD_FLAG : AND.w #$0020 : BEQ + : BRL +++ : +
 	LDA HUDDungeonItems : AND.w #$0001 : BNE + : BRL ++ : +
-		LDA.w #$2810 : STA $1684 ; small keys icon
+		LDA.w #$2810 : STA $16C4 ; small keys icon
 		SEP #$20 ; set 8-bit accumulator
 		; Small Keys
-		LDA.b #$16 : !ADD $7EF37D : STA $1686 : LDA.b #$28 : ADC #$00 : sta.w $1686+1 ; Hyrule Castle
-		LDA.b #$16 : !ADD $7EF380 : STA $1688 : LDA.b #$28 : ADC #$00 : sta.w $1688+1 ; Agahnims Tower
+		LDA.b #$16 : !ADD $7EF37D : STA $16C6 : LDA.b #$28 : ADC #$00 : sta.w $16C6+1 ; Hyrule Castle
+		LDA.b #$16 : !ADD $7EF380 : STA $16C8 : LDA.b #$28 : ADC #$00 : sta.w $16C8+1 ; Agahnims Tower
 
-		LDA.b #$16 : !ADD $7EF37E : STA $168C : LDA.b #$28 : ADC #$00 : sta.w $168C+1 ; Eastern
-		LDA.b #$16 : !ADD $7EF37F : STA $168E : LDA.b #$28 : ADC #$00 : sta.w $168E+1 ; Desert
-		LDA.b #$16 : !ADD $7EF386 : STA $1690 : LDA.b #$28 : ADC #$00 : sta.w $1690+1 ; Hera
+		LDA.b #$16 : !ADD $7EF37E : STA $16CC : LDA.b #$28 : ADC #$00 : sta.w $16CC+1 ; Eastern
+		LDA.b #$16 : !ADD $7EF37F : STA $16CE : LDA.b #$28 : ADC #$00 : sta.w $16CE+1 ; Desert
+		LDA.b #$16 : !ADD $7EF386 : STA $16D0 : LDA.b #$28 : ADC #$00 : sta.w $16D0+1 ; Hera
 
-		LDA.b #$16 : !ADD $7EF382 : STA $1694 : LDA.b #$28 : ADC #$00 : sta.w $1694+1 ; PoD
-		LDA.b #$16 : !ADD $7EF381 : STA $1696 : LDA.b #$28 : ADC #$00 : sta.w $1696+1 ; Swamp
-		LDA.b #$16 : !ADD $7EF384 : STA $1698 : LDA.b #$28 : ADC #$00 : sta.w $1698+1 ; Skull Woods
-		LDA.b #$16 : !ADD $7EF387 : STA $169A : LDA.b #$28 : ADC #$00 : sta.w $169A+1 ; Thieves Town
-		LDA.b #$16 : !ADD $7EF385 : STA $169C : LDA.b #$28 : ADC #$00 : sta.w $169C+1 ; Ice
-		LDA.b #$16 : !ADD $7EF383 : STA $169E : LDA.b #$28 : ADC #$00 : sta.w $169E+1 ; Mire
-		LDA.b #$16 : !ADD $7EF388 : STA $16A0 : LDA.b #$28 : ADC #$00 : sta.w $16A0+1 ; Turtle Rock
+		LDA.b #$16 : !ADD $7EF382 : STA $16D4 : LDA.b #$28 : ADC #$00 : sta.w $16D4+1 ; PoD
+		LDA.b #$16 : !ADD $7EF381 : STA $16D6 : LDA.b #$28 : ADC #$00 : sta.w $16D6+1 ; Swamp
+		LDA.b #$16 : !ADD $7EF384 : STA $16D8 : LDA.b #$28 : ADC #$00 : sta.w $16D8+1 ; Skull Woods
+		LDA.b #$16 : !ADD $7EF387 : STA $16DA : LDA.b #$28 : ADC #$00 : sta.w $16DA+1 ; Thieves Town
+		LDA.b #$16 : !ADD $7EF385 : STA $16DC : LDA.b #$28 : ADC #$00 : sta.w $16DC+1 ; Ice
+		LDA.b #$16 : !ADD $7EF383 : STA $16DE : LDA.b #$28 : ADC #$00 : sta.w $16DE+1 ; Mire
+		LDA.b #$16 : !ADD $7EF388 : STA $16E0 : LDA.b #$28 : ADC #$00 : sta.w $16E0+1 ; Turtle Rock
 
-		LDA.b #$16 : !ADD $7EF389 : STA $16A4 : LDA.b #$28 : ADC #$00 : sta.w $16A4+1 ; Ganon's Tower
+		LDA.b #$16 : !ADD $7EF389 : STA $16E4 : LDA.b #$28 : ADC #$00 : sta.w $16E4+1 ; Ganon's Tower
 
 		REP #$20 ; set 16-bit accumulator
 	++
 
 	; Big Keys
 	LDA HUDDungeonItems : AND.w #$0002 : BNE + : BRL ++ : +
-		LDA.w #$2811 : STA $16C4 ; big key icon
+		LDA.w #$2811 : STA $1704 ; big key icon
 		LDA $7EF367 : AND.w #$0040 : BEQ + ; Hyrule Castle
-			LDA.w #$2826 : STA $16C6
+			LDA.w #$2826 : STA $1706
 		+
 		LDA $7EF367 : AND.w #$0008 : BEQ + ; Agahnims Tower
-			LDA.w #$2826 : STA $16C8
+			LDA.w #$2826 : STA $1708
 		+
 		LDA $7EF367 : AND.w #$0020 : BEQ + ; Eastern
-			LDA.w #$2826 : STA $16CC
+			LDA.w #$2826 : STA $170C
 		+
 		LDA $7EF367 : AND.w #$0010 : BEQ + ; Desert
-			LDA.w #$2826 : STA $16CE
+			LDA.w #$2826 : STA $170E
 		+
 		LDA $7EF366 : AND.w #$0020 : BEQ + ; Hera
-			LDA.w #$2826 : STA $16D0
+			LDA.w #$2826 : STA $1710
 		+
 		LDA $7EF367 : AND.w #$0002 : BEQ + ; PoD
-			LDA.w #$2826 : STA $16D4
+			LDA.w #$2826 : STA $1714
 		+
 		LDA $7EF367 : AND.w #$0004 : BEQ + ; Swamp
-			LDA.w #$2826 : STA $16D6
+			LDA.w #$2826 : STA $1716
 		+
 		LDA $7EF366 : AND.w #$0080 : BEQ + ; Skull Woods
-			LDA.w #$2826 : STA $16D8
+			LDA.w #$2826 : STA $1718
 		+
 		LDA $7EF366 : AND.w #$0010 : BEQ + ; Thieves Town
-			LDA.w #$2826 : STA $16DA
+			LDA.w #$2826 : STA $171A
 		+
 		LDA $7EF366 : AND.w #$0040 : BEQ + ; Ice
-			LDA.w #$2826 : STA $16DC
+			LDA.w #$2826 : STA $171C
 		+
 		LDA $7EF367 : AND.w #$0001 : BEQ + ; Mire
-			LDA.w #$2826 : STA $16DE
+			LDA.w #$2826 : STA $171E
 		+
 		LDA $7EF366 : AND.w #$0008 : BEQ + ; Turtle Rock
-			LDA.w #$2826 : STA $16E0
+			LDA.w #$2826 : STA $1720
 		+
 		LDA $7EF366 : AND.w #$0004 : BEQ + ; Ganon's Tower
-			LDA.w #$2826 : STA $16E4
+			LDA.w #$2826 : STA $1724
 		+
 	++
 
@@ -368,89 +407,89 @@ DrawHUDDungeonItems:
 	LDA !HUD_FLAG : AND.w #$0020 : BNE + : BRL +++ : +
 	; Maps
 	LDA HUDDungeonItems : AND.w #$0004 : BNE + : BRL ++ : +
-		LDA.w #$2821 : STA $1684 ; map icon
+		LDA.w #$2821 : STA $16C4 ; map icon
 		LDA $7EF369 : AND.w #$0040 : BEQ + ; Hyrule Castle
-			LDA.w #$2826 : STA $1686
+			LDA.w #$2826 : STA $16C6
 		+
 		LDA $7EF369 : AND.w #$0008 : BEQ + ; Agahnims Tower
-			LDA.w #$2826 : STA $1688
+			LDA.w #$2826 : STA $16C8
 		+
 		LDA $7EF369 : AND.w #$0020 : BEQ + ; Eastern
-			LDA.w #$2826 : STA $168C
+			LDA.w #$2826 : STA $16CC
 		+
 		LDA $7EF369 : AND.w #$0010 : BEQ + ; Desert
-			LDA.w #$2826 : STA $168E
+			LDA.w #$2826 : STA $16CE
 		+
 		LDA $7EF368 : AND.w #$0020 : BEQ + ; Hera
-			LDA.w #$2826 : STA $1690
+			LDA.w #$2826 : STA $16D0
 		+
 		LDA $7EF369 : AND.w #$0002 : BEQ + ; PoD
-			LDA.w #$2826 : STA $1694
+			LDA.w #$2826 : STA $16D4
 		+
 		LDA $7EF369 : AND.w #$0004 : BEQ + ; Swamp
-			LDA.w #$2826 : STA $1696
+			LDA.w #$2826 : STA $16D6
 		+
 		LDA $7EF368 : AND.w #$0080 : BEQ + ; Skull Woods
-			LDA.w #$2826 : STA $1698
+			LDA.w #$2826 : STA $16D8
 		+
 		LDA $7EF368 : AND.w #$0010 : BEQ + ; Thieves Town
-			LDA.w #$2826 : STA $169A
+			LDA.w #$2826 : STA $16DA
 		+
 		LDA $7EF368 : AND.w #$0040 : BEQ + ; Ice
-			LDA.w #$2826 : STA $169C
+			LDA.w #$2826 : STA $16DC
 		+
 		LDA $7EF369 : AND.w #$0001 : BEQ + ; Mire
-			LDA.w #$2826 : STA $169E
+			LDA.w #$2826 : STA $16DE
 		+
 		LDA $7EF368 : AND.w #$0008 : BEQ + ; Turtle Rock
-			LDA.w #$2826 : STA $16A0
+			LDA.w #$2826 : STA $16E0
 		+
 		LDA $7EF368 : AND.w #$0004 : BEQ + ; Ganon's Tower
-			LDA.w #$2826 : STA $16A4
+			LDA.w #$2826 : STA $16E4
 		+
 	++
 
 	; Compasses
 	LDA HUDDungeonItems : AND.w #$0008 : BNE + : BRL ++ : +
-		LDA.w #$2C20 : STA $16C4 ; compass icon
+		LDA.w #$2C20 : STA $1704 ; compass icon
 		LDA $7EF365 : AND.w #$0040 : BEQ + ; Hyrule Castle
-			LDA.w #$2C26 : STA $16C6
+			LDA.w #$2C26 : STA $1706
 		+
 		LDA $7EF365 : AND.w #$0008 : BEQ + ; Agahnims Tower
-			LDA.w #$2C26 : STA $16C8
+			LDA.w #$2C26 : STA $1708
 		+
 		LDA $7EF365 : AND.w #$0020 : BEQ + ; Eastern
-			LDA.w #$2C26 : STA $16CC
+			LDA.w #$2C26 : STA $170C
 		+
 		LDA $7EF365 : AND.w #$0010 : BEQ + ; Desert
-			LDA.w #$2C26 : STA $16CE
+			LDA.w #$2C26 : STA $170E
 		+
 		LDA $7EF364 : AND.w #$0020 : BEQ + ; Hera
-			LDA.w #$2C26 : STA $16D0
+			LDA.w #$2C26 : STA $1710
 		+
 		LDA $7EF365 : AND.w #$0002 : BEQ + ; PoD
-			LDA.w #$2C26 : STA $16D4
+			LDA.w #$2C26 : STA $1714
 		+
 		LDA $7EF365 : AND.w #$0004 : BEQ + ; Swamp
-			LDA.w #$2C26 : STA $16D6
+			LDA.w #$2C26 : STA $1716
 		+
 		LDA $7EF364 : AND.w #$0080 : BEQ + ; Skull Woods
-			LDA.w #$2C26 : STA $16D8
+			LDA.w #$2C26 : STA $1718
 		+
 		LDA $7EF364 : AND.w #$0010 : BEQ + ; Thieves Town
-			LDA.w #$2C26 : STA $16DA
+			LDA.w #$2C26 : STA $171A
 		+
 		LDA $7EF364 : AND.w #$0040 : BEQ + ; Ice
-			LDA.w #$2C26 : STA $16DC
+			LDA.w #$2C26 : STA $171C
 		+
 		LDA $7EF365 : AND.w #$0001 : BEQ + ; Mire
-			LDA.w #$2C26 : STA $16DE
+			LDA.w #$2C26 : STA $171E
 		+
 		LDA $7EF364 : AND.w #$0008 : BEQ + ; Turtle Rock
-			LDA.w #$2C26 : STA $16E0
+			LDA.w #$2C26 : STA $1720
 		+
 		LDA $7EF364 : AND.w #$0004 : BEQ + ; Ganon's Tower
-			LDA.w #$2C26 : STA $16E4
+			LDA.w #$2C26 : STA $1724
 		+
 	++ : +++
 	PLP
