@@ -1821,11 +1821,6 @@ JSL.l BossPrizeClearLevelToOpenDoors
 RTS
 NOP #52
 ;================================================================================
-;Kill enemy to clear level
-org $01C715 ; <- C715 - Bank01.asm:10358 - (LDA $7EF3CA : BNE .inDarkWorld)
-LDA CrystalPendantFlags_2, X
-;JSL.l GetPendantCrystalWorld
-;================================================================================
 ;org $0AC5C3 ; <- 545C3 - Bank0A.asm:1859 - (LDA $7EF374 : AND $0AC5A6, X : BEQ .fail)
 ;NOP #10
 ;CLC

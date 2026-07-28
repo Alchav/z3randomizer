@@ -43,7 +43,7 @@ BossPrizeRoomTag:
 	LDA $0403 : AND.b #$80 : BEQ .heartContainerStillExists
 
 	LDA $040C : LSR A : TAX
-	LDA $7EF3CA : BNE .inDarkWorld
+	LDA.l CrystalPendantFlags_2, X : BNE .inDarkWorld
 		LDA $7EF374 : AND.l CrystalPendantFlags, X : BNE .criticalItemAlreadyObtained
 		BRA .giveCriticalItem
 
