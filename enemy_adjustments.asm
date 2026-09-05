@@ -29,6 +29,36 @@ RTL
 ;--------------------------------------------------------------------------------
 
 ;--------------------------------------------------------------------------------
+; TransformSpriteAndClearSoldierProbes:
+; Soldier weapons are temporary sprite $41 probes whose $0DB0 points to their
+; parent sprite slot plus one. If the parent is transformed, a surviving probe
+; treats the replacement fairy/blob as a soldier and writes an invalid AI state
+; into it. Remove those probes before performing the original transformation.
+;
+; Input: A = replacement sprite ID, X = sprite being transformed.
+;--------------------------------------------------------------------------------
+TransformSpriteAndClearSoldierProbes:
+	PHA
+	LDA $00 : PHA
+	TXA : INC A : STA $00
+	PHY
+	LDY.b #$0F
+.next_probe
+	LDA $0DD0, Y : BEQ .skip_probe
+	LDA $0E20, Y : CMP.b #$41 : BNE .skip_probe
+	LDA $0DB0, Y : CMP $00 : BNE .skip_probe
+	LDA.b #$00 : STA $0DD0, Y
+	STA $0DB0, Y
+.skip_probe
+	DEY : BPL .next_probe
+	PLY
+	PLA : STA $00
+	PLA : STA $0E20, X
+	JSL.l $06B818 ; Sprite_LoadProperties
+	RTL
+;--------------------------------------------------------------------------------
+
+;--------------------------------------------------------------------------------
 ; WallmastersStayDeadCheckDamage:
 ; optionally clear the active Wallmaster spawner when one of its spawned
 ; Wallmasters is killed, preventing further spawns in this room visit.
